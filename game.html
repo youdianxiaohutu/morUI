@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游戏主界面</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      background: url('a.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+    /* 左上角切换连接按钮 */
+    .switch-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #00d4ff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .switch-btn:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    /* 右上角成就按钮 */
+    .achievements-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #ffd700;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .achievements-btn:hover {
+      background: rgba(255, 215, 0, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    }
+    /* 主内容区域 */
+    .main-content {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    /* 创造世界按钮 */
+    .start-btn {
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      border: none;
+      border-radius: 16px;
+      padding: 20px 60px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+    }
+    .start-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.6);
+    }
+    .start-btn:active { transform: translateY(0); }
+    /* 选择设定按钮 */
+    .settings-btn {
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    .settings-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+    }
+    /* 右上角个性化按钮 */
+    .custom-btn {
+      position: fixed;
+      top: 20px;
+      right: 140px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #00ff88;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+    /* 底部信息 */
+    .info {
+      position: fixed;
+      bottom: 20px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 左上角切换连接按钮 -->
+  <button class="switch-btn" onclick="switchAccount()">&#x1F504; 切换连接</button>
+  <!-- 右上角成就按钮 -->
+  <button class="custom-btn" onclick="openCustom()">&#x1F4A0; 个性化</button>
+  <button class="achievements-btn" onclick="openAchievements()">&#x1F3C6; 成就</button>
+  <!-- 主内容 -->
+  <div class="main-content">
+    <!-- 创造世界按钮 -->
+    <button class="start-btn" onclick="startGame()">创造世界</button>
+    <!-- 选择设定按钮 -->
+    <button class="settings-btn" onclick="openSettings()">选择设定</button>
+  </div>
+  <!-- 底部信息 -->
+  <div class="info">作者：有点小狐涂</div>
+  <script>
+    // 切换连接：返回登录页重新配置
+    function switchAccount() {
+      // 清除所有登录信息，确保完全退出连接
+      localStorage.removeItem('apiKey');
+      localStorage.removeItem('modelName');
+      localStorage.removeItem('baseUrl');
+      // 跳转到登录页面
+      window.location.href = 'login.html';
+    }
+    // 检查是否已登录
+    window.onload = function() {
+      const apiKey = localStorage.getItem('apiKey');
+      if (!apiKey) {
+        window.location.href = 'login.html';
+      }
+      // 加载保存的背景
+      const savedBg = localStorage.getItem('customBg');
+      if (savedBg) {
+        document.body.style.backgroundImage = "url('" + savedBg + "')";
+      }
+    };
+    // 创造世界：跳转到聊天页面
+    function startGame() {
+      window.location.href = 'chat.html';
+    }
+    // 打开设定
+    function openSettings() {
+      window.location.href = 'settings.html';
+    }
+    // 打开成就
+    function openAchievements() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:30px;max-width:400px;width:90%;color:white;';
+      var qicha = localStorage.getItem('qichaAchieved') === 'true';
+      var op = qicha ? '1' : '0.5';
+      var extra = qicha ? 'border:1px solid rgba(255,215,0,0.4);box-shadow:0 0 15px rgba(255,215,0,0.2);' : '';
+      modal.innerHTML = '<h2 style="text-align:center;margin-bottom:20px;color:#ffd700;">&#x1F3C6; \u6210\u5c31\u7cfb\u7edf</h2>'
+        + '<div style="padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;opacity:' + op + ';' + extra + '">'
+        + '<div style="font-weight:bold;font-size:16px;">\u5929\u547d\u96be\u8fdd</div>'
+        + (qicha ? '<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">\u96be\u9053\u662f\u5929\u610f\uff1f\uff01</div>' : '')
+        + '</div>'
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    }
+
+
+
+
+
+    // 打开个性化设置
+    function openCustom() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:30px;max-width:400px;width:90%;color:white;';
+      var html = '<h2 style="text-align:center;margin-bottom:20px;color:#00ff88;">个性化背景</h2>';
+      html += '<div style="margin-bottom:15px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;">';
+      html += '<div style="font-size:16px;margin-bottom:10px;">选择预设背景：</div>';
+      html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+      html += '<img src="a.jpg" onclick="setBg(`a.jpg`)" style="width:80px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;" onmouseover="this.style.borderColor=`#00ff88`" onmouseout="this.style.borderColor=`transparent`;">';
+
+      html += '</div></div>';
+      html += '<div style="margin-bottom:15px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;">';
+      html += '<div style="font-size:16px;margin-bottom:10px;">上传自定义背景：</div>';
+      html += '<input type="file" id="bgUpload" accept="image/*" onchange="uploadBg(event)" style="color:white;font-size:14px;"></div>';
+      html += '<button onclick="this.closest(`div[style]`).parentElement.remove()" style="width:100%;padding:12px;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:white;font-size:16px;cursor:pointer;">关闭</button>';
+      modal.innerHTML = html;
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    }
+    // 设置背景图片
+    function setBg(url) {
+      document.body.style.backgroundImage = "url('" + url + "')";
+      localStorage.setItem('customBg', url);
+      if (url === 'a.jpg' || !url.startsWith('http')) {
+        localStorage.removeItem('customBgData');
+      }
+    }
+    // 上传背景图片
+    function uploadBg(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        document.body.style.backgroundImage = "url('" + dataUrl + "')";
+        localStorage.setItem('customBg', dataUrl);
+        localStorage.setItem('customBgData', dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>

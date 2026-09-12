@@ -1,0 +1,2401 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: row;
+      background: linear-gradient(180deg, #2D1B33, #1a1a2e) no-repeat center center fixed;
+background-size: cover;
+      color: #fff;
+    }
+
+    /* 左侧导航 */
+    .sidebar {
+      width: 160px;
+      flex-shrink: 0;
+      background: rgba(0,0,0,0.3);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 0;
+    }
+    .sidebar-title {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+    .nav-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      font-size: 15px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); }
+    .nav-item.active {
+      background: rgba(0,212,255,0.1);
+      border-left-color: #00d4ff;
+      color: #00d4ff;
+    }
+
+    /* 右侧主区域 */
+      .main {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      overflow: hidden;
+    }
+    .pages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .page {
+      display: none;
+    }
+    .page.active { display: block; }
+
+    /* 页面内容区 */
+    .page {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: none;
+    }
+    .page.active { display: block; }
+
+    /* ===== 状态卡 ===== */
+    .status-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 1000px;
+    }
+        .char-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .char-meta {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 6px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+      padding-left: 8px;
+      border-left: 3px solid #00d4ff;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+      margin-top: 12px;
+    }
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+    }
+    .stat-item .name { color: rgba(255,255,255,0.7); }
+    .stat-item .value { font-weight: bold; color: #ffd700; }
+    .char-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00d4ff;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .stat-row { margin-bottom: 18px; }
+    .stat-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+    .stat-label .name { color: rgba(255,255,255,0.7); }
+    .stat-label .value { font-weight: bold; }
+    .progress-bg {
+      position: relative;
+      height: 14px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 7px;
+      transition: width 0.4s ease;
+    }
+    .hp-bar { background: linear-gradient(90deg, #ff8a8a, #c0392b); }
+    .mp-bar { background: linear-gradient(90deg, #85c1e9, #2471a3); }
+    .xp-bar { background: linear-gradient(90deg, #f9e79f, #d4ac0d); }
+
+
+    /* ===== 重要角色 ===== */
+        .roles-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .role-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 700px;
+    }
+    .role-card .char-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .role-card .char-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #00d4ff;
+    }
+    .role-card .char-meta {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 6px;
+    }
+    .role-card .section {
+      margin-bottom: 16px;
+    }
+    .role-card .section-title {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 10px;
+      padding-left: 8px;
+      border-left: 3px solid #00d4ff;
+    }
+    .role-card .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+      margin-top: 12px;
+    }
+    .role-card .stat-item {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      padding: 4px 8px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+    }
+    .role-card .stat-item .name { color: rgba(255,255,255,0.7); }
+    .role-card .stat-item .value { font-weight: bold; color: #ffd700; }
+    .add-role-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: rgba(0,212,255,0.1);
+      border: 1px dashed rgba(0,212,255,0.5);
+      border-radius: 8px;
+      color: #00d4ff;
+      cursor: pointer;
+      text-align: center;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .add-role-btn:hover {
+      background: rgba(0,212,255,0.2);
+    }
+
+      /* ===== 悟道 ===== */
+    .dao-content {
+      max-width: 700px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.8);
+    }
+    .dao-content h2 { color: #00d4ff; margin-bottom: 16px; }
+
+    .dao-circles-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 60px;
+      flex-wrap: wrap;
+      padding: 30px 0;
+    }
+    .dao-circle-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .dao-circle-wrapper.locked {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+    .dao-circle-svg {
+      width: 160px;
+      height: 160px;
+      filter: drop-shadow(0 0 8px rgba(0,212,255,0.3));
+      transition: filter 0.4s;
+    }
+    .dao-circle-wrapper.unlocked:not(.locked) .dao-circle-svg {
+      filter: drop-shadow(0 0 16px rgba(0,212,255,0.6));
+    }
+    .dao-circle-wrapper.unlocked:not(.locked):hover .dao-circle-svg {
+      filter: drop-shadow(0 0 24px rgba(0,212,255,0.9));
+    }
+    .dao-circle-svg.golden {
+      filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
+    }
+    .dao-circle-svg.golden .dao-twist-line {
+      stroke: #ffd700 !important;
+      animation: glowPulseGold 2s ease-in-out infinite;
+    }
+    @keyframes glowPulseGold {
+      0%, 100% { filter: drop-shadow(0 0 4px #ffd700); }
+      50% { filter: drop-shadow(0 0 14px #ffd700); }
+    }
+    .dao-circle-label {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+    }
+    .dao-circle-label.unlocked { color: #ffd700; }
+    .dao-circle-label.locked-label { color: rgba(255,255,255,0.3); }
+    @keyframes rotateCW {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes rotateCCW {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    .dao-twist-group-cw {
+      transform-origin: 80px 80px;
+      animation: rotateCW 8s linear infinite;
+    }
+    .dao-twist-group-ccw {
+      transform-origin: 80px 80px;
+      animation: rotateCCW 8s linear infinite;
+    }
+    .dao-config-panel {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .dao-config-panel.show { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .dao-config-panel h3 {
+      color: #00d4ff;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    .dao-config-panel .field {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      align-items: flex-start;
+    }
+    .dao-config-panel .field-label {
+      min-width: 80px;
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      padding-top: 6px;
+    }
+    .dao-config-panel .field-value {
+      flex: 1;
+      font-size: 14px;
+      color: #fff;
+    }
+    .dao-config-panel textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 40px;
+      font-family: inherit;
+      outline: none;
+    }
+    .dao-config-panel textarea:focus {
+      border-color: #00d4ff;
+    }
+    .dao-save-btn {
+      margin-top: 12px;
+      padding: 8px 20px;
+      background: rgba(0,212,255,0.15);
+      border: 1px solid rgba(0,212,255,0.4);
+      border-radius: 8px;
+      color: #00d4ff;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .dao-save-btn:hover {
+      background: rgba(0,212,255,0.3);
+    }
+
+    /* ===== 聊天区 ===== */
+      .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-left: 1px solid rgba(255,255,255,0.1);
+    }
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .chat-header {
+      padding: 15px 20px;
+      background: rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .chat-header h1 { font-size: 18px; color: #00d4ff; }
+    .header-center {
+      flex: 1;
+      max-width: 280px;
+      margin: 0 12px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: rgba(0,212,255,0.5);
+    }
+    .search-input::placeholder {
+      color: rgba(255,255,255,0.35);
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.2); }
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      line-height: 1.6;
+      word-wrap: break-word;
+    }
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message.ai {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-bottom-left-radius: 4px;
+    }
+    .message.error {
+      align-self: center;
+      background: rgba(255,107,107,0.2);
+      color: #ff6b6b;
+      border: 1px solid rgba(255,107,107,0.3);
+    }
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      border-bottom-left-radius: 4px;
+    }
+    .typing-indicator span {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typing 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-10px); }
+    }
+
+    /* 输入区 */
+      .input-container {
+      padding: 15px 20px;
+      background: transparent;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: auto;
+    }
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+    #messageInput {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #fff;
+      font-size: 15px;
+      resize: none;
+      outline: none;
+      min-height: 50px;
+      max-height: 150px;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+    #messageInput::placeholder { color: rgba(255,255,255,0.35); }
+    #messageInput:focus { border-color: #00d4ff; background: rgba(255,255,255,0.12); }
+    .send-btn {
+      width: 50px; height: 50px;
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border: none; border-radius: 12px;
+      color: #fff; font-size: 20px;
+      cursor: pointer; transition: all 0.3s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,212,255,0.4); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  
+
+  
+    /* 右上角个性化按钮 */
+
+    .options-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      max-height: 38vh;
+      overflow-y: auto;
+    }
+    .opt-btn {
+      padding: 8px 12px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .opt-btn:hover {
+      background: rgba(0,212,255,0.2);
+      border-color: rgba(0,212,255,0.6);
+      color: #fff;
+    }
+    .custom-btn {
+      position: fixed;
+      top: 20px;
+      right: 140px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #00ff88;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+    }
+    .custom-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    }
+
+    .end-sim-btn {
+      background: rgba(255, 60, 60, 0.12);
+      border: 1px solid rgba(255, 60, 60, 0.4);
+      border-radius: 8px;
+      padding: 6px 14px;
+      color: #ff6b6b;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .end-sim-btn:hover {
+      background: rgba(255, 60, 60, 0.25);
+      border-color: rgba(255, 80, 80, 0.7);
+      color: #ff8a8a;
+      box-shadow: 0 0 12px rgba(255, 60, 60, 0.3);
+    }
+
+    /* ===== 设置页 ===== */
+    .color-btn {
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.8);
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .color-btn.active {
+      border-color: #00d4ff;
+      background: rgba(0,212,255,0.15);
+    }
+    .color-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      display: inline-block;
+    }
+    #colorPreview .message {
+      font-size: 14px;
+    }
+
+    :root {
+      --text-color: #ffffff;
+    }
+    .message.ai { color: var(--text-color) !important; }
+    .message.user { color: var(--text-color) !important; }
+    .char-name { color: var(--text-color) !important; }
+    .char-meta { color: var(--text-color) !important; }
+    .section-title { color: var(--text-color) !important; }
+    .stat-label .name, .stat-item .name { color: var(--text-color) !important; }
+    .stat-label .value, .stat-item .value { color: var(--text-color) !important; }
+    .field-label { color: var(--text-color) !important; }
+    .field-value { color: var(--text-color) !important; }
+
+    .dao-circle-label { color: var(--text-color) !important; }
+    .dao-content h2 { color: var(--text-color) !important; }
+</style>
+</head>
+<body>
+  <div id="rawMeta" style="display:none;"></div>
+  <div class="sidebar">
+    <div class="sidebar-title"></div>
+    <div class="nav-item active" data-page="status" onclick='switchPage("status")'>📊 状态卡</div>
+    <div class="nav-item" data-page="roles" onclick='switchPage("roles")'>🎭 重要角色</div>
+    <div class="nav-item" data-page="dao" onclick='switchPage("dao")'>☯️ 悟道</div>
+    <div class="nav-item" onclick="showSaveLoadUI()">&#x1F4BE; 存档/读档</div>
+    <div class="nav-item" style="margin-top:auto;border-top:1px solid rgba(255,255,255,0.1);border-left:none;" onclick="openCustom()">&#x1F4A0; 个性化</div>
+    <div class="nav-item" onclick="switchPage('settings')">&#x2699;设置</div>
+  </div>
+  <div class="main">
+    <div class="pages-container">
+      <div class="page active" id="page-status">
+        <div class="status-card">
+          <div class="char-header">
+            <div class="char-name" id="charName">加载中...</div>
+            <div class="char-meta" id="charMeta">加载中...</div>
+          </div>
+          <div class="section">
+            <div class="stat-row"><div class="stat-label"><span class="name">境界</span><span class="value" id="realmValue">❰ 加载中 ❱</span></div></div>
+            <div class="stat-row"><div class="stat-label"><span class="name">灵根</span><span class="value" id="linggenValue">❰ -- ❱</span></div></div>
+            <div class="stat-row"><div class="stat-label"><span class="name">突破</span><span class="value" id="xpValue">--%</span></div><div class="progress-bg"><div class="progress-bar xp-bar" id="xpBar" style="width:0%"></div></div></div>
+            <div class="stat-row"><div class="stat-label"><span class="name">寿元</span><span class="value" id="lifeValue">--/-- 年</span></div><div class="progress-bg"><div class="progress-bar xp-bar" id="lifeBar" style="width:0%"></div></div></div>
+          </div>
+          <div class="section">
+            <div class="stat-row"><div class="stat-label"><span class="name">气血</span><span class="value" id="hpValue">--/--</span></div><div class="progress-bg"><div class="progress-bar hp-bar" id="hpBar" style="width:0%"></div></div></div>
+            <div class="stat-row"><div class="stat-label"><span class="name">灵气</span><span class="value" id="mpValue">--/--</span></div><div class="progress-bg"><div class="progress-bar mp-bar" id="mpBar" style="width:0%"></div></div></div>
+          </div>
+          <div class="section">
+            <div class="section-title">▎六维根基</div>
+            <div class="stats-grid" id="statsGrid">
+              <div class="stat-item"><span class="name">根骨</span><span class="value" id="rootValue">❰ -- ❱</span></div>
+              <div class="stat-item"><span class="name">神识</span><span class="value" id="spiritValue">❰ -- ❱</span></div>
+              <div class="stat-item"><span class="name">身法</span><span class="value" id="agilityValue">❰ -- ❱</span></div>
+              <div class="stat-item"><span class="name">悟性</span><span class="value" id="insightValue">❰ -- ❱</span></div>
+              <div class="stat-item"><span class="name">气运</span><span class="value" id="luckValue">❰ -- ❱</span></div>
+              <div class="stat-item"><span class="name">魅力</span><span class="value" id="charmValue">❰ -- ❱</span></div>
+            </div>
+          </div>
+          <div class="section"><div class="stat-row"><div class="stat-label"><span class="name">状态</span><span class="value" id="statusValue">❰ 加载中 ❱</span></div></div></div>
+          <div class="section"><div class="stat-row"><div class="stat-label"><span class="name">灵石</span><span class="value" id="stoneValue">❰ 加载中 ❱</span></div></div></div>
+        </div>
+      </div>
+      <div class="page" id="page-roles">
+        <div class="roles-container" id="rolesContainer"></div>
+      </div>
+      <div class="page" id="page-dao">
+        <div class="dao-content">
+          <h2>悟道记录</h2>
+          <div class="dao-circles-wrap" id="daoCirclesWrap"></div>
+          <div class="dao-config-panel" id="daoConfigPanel">
+            <h3 id="daoPanelTitle"></h3>
+            <div class="field"><span class="field-label">名字</span><span class="field-value" id="daoFieldName"></span></div>
+            <div class="field"><span class="field-label">作用</span><span class="field-value" id="daoFieldDesc"></span></div>
+            <div class="field"><span class="field-label">注释</span><span class="field-value" id="daoFieldComment"></span></div>
+            <div class="field"><span class="field-label">所需悟道点数</span><span class="field-value" id="daoFieldCost"></span></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="page" id="page-settings">
+        <div class="status-card">
+          <div class="char-header">
+            <div class="char-name">字体颜色设置</div>
+          </div>
+          <div class="section">
+            <div class="section-title">选择字体颜色</div>
+            <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+              <button class="color-btn" data-color="#ffffff" onclick="setMsgColor('#ffffff')"><span class="color-dot" style="background:#fff;border-color:#666"></span>白色</button>
+              <button class="color-btn" data-color="#000000" onclick="setMsgColor('#000000')"><span class="color-dot" style="background:#000;border-color:#666"></span>黑色</button>
+              <button class="color-btn" data-color="#ffd700" onclick="setMsgColor('#ffd700')"><span class="color-dot" style="background:#ffd700;border-color:#b8860b"></span>黄色</button>
+            </div>
+          </div>
+          <div class="section" style="margin-top:20px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chat-area" id="chatArea">
+      <div class="chat-header">
+        <button class="back-btn" onclick="window.location.href='game.html'">← 返回</button>
+        <div class="header-center">
+          <input class="search-input" id="searchInput" type="text" placeholder="搜索聊天记录..." oninput="searchMessages(event)">
+        </div>
+        <span class="model-info" id="modelInfo">加载中...</span>
+        <button class="end-sim-btn" onclick="sendEndSimMessage()">结束模拟</button>
+      </div>
+      <div class="chat-container" id="chatContainer">
+        <div class="typing-indicator" id="typingIndicator"><span></span><span></span><span></span></div>
+      </div>  
+      <div class="input-container" id="inputContainer"></div>
+      <div class="options-row" id="optionsRow"></div>
+      <div class="input-wrapper">
+      <textarea id="messageInput" placeholder="输入消息..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+      </div>
+      </div>
+    </div>
+  </div>
+
+    
+  <script>
+
+    // ===== 配置（从 localStorage 读取，与 login.html 一致）=====
+    function loadConfig() {
+      return {
+        baseUrl: localStorage.getItem('baseUrl') || 'http://localhost:8080/v1',
+        apiKey: localStorage.getItem('apiKey') || '',
+        modelName: localStorage.getItem('modelName') || 'default-model'
+      };
+    }
+
+    let config = loadConfig();
+    let chatHistory = [];
+
+    // 更新 header 显示的模型信息
+    function updateModelInfo() {
+      const el = document.getElementById('modelInfo');
+      if (config.apiKey) {
+        el.textContent = config.modelName;
+      } else {
+        el.textContent = '未配置';
+      }
+    }
+
+        const DEFAULT_STATS = { name: '无名剑客', hp: { current: 100, max: 100 }, mp: { current: 0, max: 0 }, xp: { current: 0, max: 100 } };
+    let charStats = { ...DEFAULT_STATS };
+
+    async function loadStats() {
+      try {
+        const res = await fetch('ztk/self/stats.json');
+        if (res.ok) {
+          charStats = await res.json();
+        }
+      } catch(e) { /* 使用默认值 */ }
+      updateStatsUI();
+    }
+    const roles = [];
+    // ===== 增量更新运行时状态（纯内存 + 局部刷新，不写文件） =====
+    const roleOverlay = {};   // key: role文件编号(1-based)，值: 部分变化字段
+    let runtimeRoles = [];    // 会话内新增的角色: {id, data}
+    let maxFileRoleId = 0;    // ztk/others 里实际存在的最大 role 编号
+    let fileRoleData = {};    // roleId(1-based) → 文件角色合并 overlay 后的数据缓存（供按名字定位角色）
+    let lastUpdatedSections = [];
+    let roleCounter = 1;
+
+    function mergeObject(base, extra) {
+      for (const k in extra) {
+        const v = extra[k];
+        if (v !== undefined && v !== null && typeof v === "object" && !Array.isArray(v) &&
+            base[k] && typeof base[k] === "object" && !Array.isArray(base[k])) {
+          mergeObject(base[k], v);
+        } else if (v !== undefined) {
+          base[k] = v;
+        }
+      }
+      return base;
+    }
+
+    function applyRoleDeltas(list) {
+      for (const item of (list || [])) {
+        if (!item) continue;
+        const { index, ...fields } = item;
+        // 按名字优先合并：模型可能把 index 传错（按本次数组顺序重排），但每次都会传 name；
+        // 命中已有角色时忽略 index，直接合并到名字对应的角色
+        if (typeof fields.name === 'string' && fields.name) {
+          const target = findRoleByName(fields.name);
+          if (target) {
+            if (index !== undefined && index !== null && index !== target.globalIndex) {
+              console.warn('[ROLES] index 与名字不一致，已按名字合并: ' + fields.name + ' -> [' + target.globalIndex + '] (传入 index=' + index + ')');
+            }
+            mergeObject(target.data, fields);
+            continue;
+          }
+        }
+        // 玩家本人不属于重要角色：名字与玩家一致则忽略该项
+        if (charStats.name && typeof fields.name === 'string' && fields.name === charStats.name) {
+          console.warn('[ROLES] 玩家本人 (' + charStats.name + ') 被写进 roles，已忽略');
+          continue;
+        }
+        // 防 index 错路由：该 index 已被其他名字的角色占用时，不覆盖，按新角色追加到末尾
+        if (index !== undefined && index !== null) {
+          const occupant = getRoleNameAtGlobalIndex(index);
+          if (occupant && typeof fields.name === 'string' && fields.name && occupant !== fields.name) {
+            console.warn('[ROLES] index=' + index + ' 已属于 ' + occupant + '，本项为 ' + fields.name + '，不覆盖，已按新角色追加');
+            const id = maxFileRoleId + runtimeRoles.length + 1;
+            const data = {
+              name: `角色${id}`, gender: "", appearance: "", realm: "", linggen: "",
+              status: "", stones: "", breakthrough: "", favor: 0,
+              hp: { current: "", max: "" }, mp: { current: "", max: "" }, life: { current: "", max: "" },
+              stats: { root: "", spirit: "", agility: "", insight: "", luck: "", charm: "" }
+            };
+            mergeObject(data, fields);
+            runtimeRoles.push({ id, data });
+            continue;
+          }
+        }
+        if (index === undefined || index === null) {
+          // 新增角色：接在现有角色后面
+          const id = maxFileRoleId + runtimeRoles.length + 1;
+          const data = {
+            name: `角色${id}`, gender: "", appearance: "", realm: "", linggen: "",
+            status: "", stones: "", breakthrough: "", favor: 0,
+            hp: { current: "", max: "" }, mp: { current: "", max: "" }, life: { current: "", max: "" },
+            stats: { root: "", spirit: "", agility: "", insight: "", luck: "", charm: "" }
+          };
+          mergeObject(data, fields);
+          runtimeRoles.push({ id, data });
+        } else if (index + 1 <= maxFileRoleId) {
+          // 指向文件角色（role1..roleN）
+          const rid = index + 1;
+          roleOverlay[rid] = mergeObject(roleOverlay[rid] || {}, fields);
+        } else {
+          // 指向不存在的编号 → 按位置补建运行时角色（中间缺位也补齐）
+          const rj = index - maxFileRoleId;
+          while (runtimeRoles.length <= rj) {
+            const id = maxFileRoleId + runtimeRoles.length + 1;
+            const data = {
+              name: `角色${id}`, gender: "", appearance: "", realm: "", linggen: "",
+              status: "", stones: "", breakthrough: "", favor: 0,
+              hp: { current: "", max: "" }, mp: { current: "", max: "" }, life: { current: "", max: "" },
+              stats: { root: "", spirit: "", agility: "", insight: "", luck: "", charm: "" }
+            };
+            runtimeRoles.push({ id, data });
+          }
+          mergeObject(runtimeRoles[rj].data, fields);
+        }
+      }
+    }
+
+    function findRoleByName(name) {
+      for (let rid = 1; rid <= maxFileRoleId; rid++) {
+        let d = fileRoleData[rid];
+        if (roleOverlay[rid]) {
+          d = d ? JSON.parse(JSON.stringify(d)) : {};
+          mergeObject(d, roleOverlay[rid]);
+        }
+        if (d && d.name === name) {
+          roleOverlay[rid] = roleOverlay[rid] || {};
+          return { globalIndex: rid - 1, data: roleOverlay[rid] };
+        }
+      }
+      for (let j = 0; j < runtimeRoles.length; j++) {
+        if ((runtimeRoles[j].data.name || '') === name) {
+          return { globalIndex: maxFileRoleId + j, data: runtimeRoles[j].data };
+        }
+      }
+      return null;
+    }
+
+    // 重要角色显示条件：favor<0 或 favor>70（与提示词引导对齐的前端兜底）
+    function isKeyRoleVisible(data) {
+      let f = Number(data ? data.favor : '');
+      if (!isFinite(f)) f = 0;
+      return f < 0 || f > 70;
+    }
+
+    function getRoleNameAtGlobalIndex(gi) {
+      if (gi + 1 <= maxFileRoleId) {
+        const rid = gi + 1;
+        let d = fileRoleData[rid];
+        if (roleOverlay[rid]) {
+          d = d ? JSON.parse(JSON.stringify(d)) : {};
+          mergeObject(d, roleOverlay[rid]);
+        }
+        return d ? (d.name || '') : '';
+      }
+      const rj = gi - maxFileRoleId;
+      if (rj >= 0 && rj < runtimeRoles.length) return runtimeRoles[rj].data.name || '';
+      return '';
+    }
+
+    // 同名角色合并：把后来者（runtime）的非空字段并入先到者（文件 overlay 或更早的 runtime），并移除重复项
+    function mergeNonEmpty(base, extra) {
+      for (const k in extra) {
+        const v = extra[k];
+        if (v === undefined || v === null || v === '' || v === 0) continue;
+        if (typeof v === 'object' && !Array.isArray(v)) {
+          if (!base[k] || typeof base[k] !== 'object' || Array.isArray(base[k])) base[k] = {};
+          mergeNonEmpty(base[k], v);
+        } else {
+          base[k] = v;
+        }
+      }
+      return base;
+    }
+
+    function consolidateDuplicateRoles() {
+      const targets = {};
+      for (let rid = 1; rid <= maxFileRoleId; rid++) {
+        let d = fileRoleData[rid];
+        if (roleOverlay[rid]) {
+          d = d ? JSON.parse(JSON.stringify(d)) : {};
+          mergeObject(d, roleOverlay[rid]);
+        }
+        const nm = d ? (d.name || '') : '';
+        if (nm) {
+          roleOverlay[rid] = roleOverlay[rid] || {};
+          targets[nm] = { data: roleOverlay[rid] };
+        }
+      }
+      for (let j = 0; j < runtimeRoles.length; j++) {
+        const nm = runtimeRoles[j].data.name || '';
+        if (!nm) continue;
+        if (targets[nm]) {
+          mergeNonEmpty(targets[nm].data, runtimeRoles[j].data);
+          runtimeRoles.splice(j, 1);
+          j--;
+        } else {
+          targets[nm] = { data: runtimeRoles[j].data };
+        }
+      }
+    }
+
+    function applyDaoDeltas(dao) {
+      if (dao.circles) {
+        for (const c of dao.circles) {
+          if (!c || !c.name) continue;
+          const target = daoCircles.find(x => x.name === c.name || x.path === c.name);
+          if (target) Object.assign(target, c);
+        }
+      }
+      if (dao.configs) {
+        for (const key of Object.keys(dao.configs)) {
+          daoConfigs[key] = mergeObject(daoConfigs[key] || {}, dao.configs[key]);
+          const target = daoCircles.find(x => x.name === key || x.path === key);
+          if (target && dao.configs[key]) {
+            if (dao.configs[key].unlocked !== undefined) target.unlocked = dao.configs[key].unlocked;
+            if (dao.configs[key].cost !== undefined) target.cost = dao.configs[key].cost;
+          }
+        }
+      }
+      renderDaoCircles();
+      if (selectedCircleId !== null) {
+        const c = daoCircles.find(x => x.id === selectedCircleId);
+        if (c) {
+          const cfg = daoConfigs[c.path] || {};
+          document.getElementById('daoFieldName').textContent = cfg.name || '()';
+          document.getElementById('daoFieldDesc').textContent = cfg.desc || '()';
+          document.getElementById('daoFieldComment').textContent = cfg.comment || '()';
+          document.getElementById('daoFieldCost').textContent = c.cost + (c.costRatio === 1.0 ? ' (已激活)' : '');
+        }
+      }
+    }
+
+    async function loadRole(roleId) {
+      try {
+        const res = await fetch(`ztk/others/role${roleId}.json`);
+        if (res.ok) {
+          const data = await res.json();
+          if (roleOverlay[roleId]) mergeObject(data, roleOverlay[roleId]);
+          fileRoleData[roleId] = data;
+          return data;
+        }
+      } catch(e) {}
+      return null;
+    }
+
+    function renderRoleCard(roleData, index) {
+      const card = document.createElement('div');
+      card.className = 'role-card';
+      card.id = `role-card-${index}`;
+
+      const hp = roleData.hp || { current: '', max: '' };
+      const mp = roleData.mp || { current: '', max: '' };
+      const life = roleData.life || { current: '', max: '' };
+      const stats = roleData.stats || {};
+      const favor = roleData.favor || 0;
+
+      card.innerHTML = `
+        <div class="char-header">
+          <div class="char-name">${roleData.name || '角色' + (index + 1)}</div>
+          <div class="char-meta">${roleData.gender || ''} · ${roleData.appearance || ''}</div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">境界</span><span class="value">❰ ${roleData.realm || '--'} ❱</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">突破</span><span class="value">${roleData.breakthrough || '--'}%</span></div>
+            <div class="progress-bg"><div class="progress-bar xp-bar" style="width:${roleData.breakthrough || 0}%"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">寿元</span><span class="value">❰ ${life.current}/${life.max} 年 ❱</span></div>
+            <div class="progress-bg"><div class="progress-bar xp-bar" style="width:${life.max > 0 ? Math.round(life.current/life.max*100) : 0}%"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">好感度</span><span class="value">❰ ${favor} ❱</span></div>
+            <div class="progress-bg">
+              <div class="progress-bar" id="favorBar${index}" style="width:${Math.abs(favor)}%;background:${favor >= 0 ? "linear-gradient(90deg,#7b1fa2,#c2185b)" : "linear-gradient(90deg,#8b0000,#a52a2a)"}"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">气血</span><span class="value">❰ ${hp.current}/${hp.max} ❱</span></div>
+            <div class="progress-bg"><div class="progress-bar hp-bar" style="width:${hp.max > 0 ? Math.round(hp.current/hp.max*100) : 0}%"></div></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">灵气</span><span class="value">❰ ${mp.current}/${mp.max} ❱</span></div>
+            <div class="progress-bg"><div class="progress-bar mp-bar" style="width:${mp.max > 0 ? Math.round(mp.current/mp.max*100) : 0}%"></div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">▎六维根基</div>
+          <div class="stats-grid">
+            <div class="stat-item"><span class="name">根骨</span><span class="value">❰ ${stats.root || '--'} ❱</span></div>
+            <div class="stat-item"><span class="name">神识</span><span class="value">❰ ${stats.spirit || '--'} ❱</span></div>
+            <div class="stat-item"><span class="name">身法</span><span class="value">❰ ${stats.agility || '--'} ❱</span></div>
+            <div class="stat-item"><span class="name">悟性</span><span class="value">❰ ${stats.insight || '--'} ❱</span></div>
+            <div class="stat-item"><span class="name">气运</span><span class="value">❰ ${stats.luck || '--'} ❱</span></div>
+            <div class="stat-item"><span class="name">魅力</span><span class="value">❰ ${stats.charm || '--'} ❱</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">状态</span><span class="value">❰ ${roleData.status || '--'} ❱</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="stat-row">
+            <div class="stat-label"><span class="name">灵石</span><span class="value">❰ ${roleData.stones || '--'} ❱</span></div>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+
+    async function loadAllRoles() {
+      const container = document.getElementById('rolesContainer');
+      container.innerHTML = '';
+      let i = 1;
+      maxFileRoleId = 0;
+      while (true) {
+        if (!(await loadRole(i))) break;
+        maxFileRoleId = i;
+        i++;
+      }
+      consolidateDuplicateRoles();
+      i = 1;
+      while (true) {
+        const roleData = await loadRole(i);
+        if (!roleData) break;
+        maxFileRoleId = i;
+        if (isKeyRoleVisible(roleData) && !(charStats.name && roleData.name === charStats.name)) {
+          const card = renderRoleCard(roleData, i - 1);
+          container.appendChild(card);
+        }
+        i++;
+      }
+      for (let j = 0; j < runtimeRoles.length; j++) {
+        if (charStats.name && runtimeRoles[j].data.name === charStats.name) continue;
+        if (!isKeyRoleVisible(runtimeRoles[j].data)) continue;
+        const card = renderRoleCard(runtimeRoles[j].data, maxFileRoleId + j);
+        card.id = `role-card-${maxFileRoleId + j}`;
+        container.appendChild(card);
+      }
+      roleCounter = Math.max(roleCounter, maxFileRoleId + runtimeRoles.length + 1);
+    }
+
+    function addNewRole() {
+      const roleId = roleCounter;
+      roleCounter++;
+      
+      // 创建默认角色数据
+      const defaultRole = {
+        name: `角色${roleId}`,
+        gender: "",
+        appearance: "",
+        realm: "",
+        hp: { current: "", max: "" },
+        mp: { current: "", max: "" },
+        life: { current: "", max: "" },
+        breakthrough: "",
+        stats: { root: "", spirit: "", agility: "", insight: "", luck: "", charm: "" },
+        status: "",
+        stones: "",
+        favor: 0,
+      };
+      
+      // 保存到 localStorage
+      const allRoles = JSON.parse(localStorage.getItem('roles') || '[]');
+      allRoles.push({ id: roleId, data: defaultRole });
+      localStorage.setItem('roles', JSON.stringify(allRoles));
+      
+      // 渲染新角色卡片
+      const card = renderRoleCard(defaultRole, allRoles.length - 1);
+      card.id = `role-card-${allRoles.length - 1}`;
+      document.getElementById('rolesContainer').appendChild(card);
+    }
+
+    // 页面切换时加载角色
+    function switchPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      document.querySelector('.nav-item[data-page="' + page + '"]').classList.add('active');
+      
+      if (page === 'roles') {
+        loadAllRoles();
+      }
+          // Sync text color
+      var _c = document.documentElement.style.getPropertyValue('--text-color').trim() || localStorage.getItem('msgColor') || '#ffffff';
+      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value, .dao-circle-label, .dao-content h2').forEach(function(el) { el.style.color = _c; });
+
+      var _c = document.documentElement.style.getPropertyValue('--text-color').trim() || localStorage.getItem('msgColor') || '#ffffff';
+      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value, .dao-circle-label, .dao-content h2').forEach(function(el) { el.style.color = _c; });
+}
+
+    function updateStatsUI() {
+        document.getElementById('charName').textContent = charStats.name || '无名剑客';
+        document.getElementById('charMeta').textContent = [charStats.gender, charStats.appearance].filter(Boolean).join(' · ');
+        document.getElementById('realmValue').textContent = '❰ ' + (charStats.realm || '--') + ' ❱';
+        document.getElementById('linggenValue').textContent = '❰ ' + (charStats.linggen || '--') + ' ❱';
+        document.getElementById('statusValue').textContent = '❰ ' + (charStats.status || '--') + ' ❱';
+        document.getElementById('stoneValue').textContent = '❰ ' + (charStats.stones || '--') + ' ❱';
+        
+        const hp = charStats.hp || { current: 100, max: 100 };
+        const mp = charStats.mp || { current: 0, max: 0 };
+        const xp = charStats.xp || { current: 0, max: 100 };
+        const life = charStats.life || { current: 0, max: 80 };
+        document.getElementById('hpValue').textContent = hp.current !== '' ? hp.current + '/' + hp.max : '--/--';
+        document.getElementById('mpValue').textContent = mp.current !== '' ? mp.current + '/' + mp.max : '--/--';
+        document.getElementById('xpValue').textContent = (charStats.breakthrough || '--') + '%';
+        document.getElementById('lifeValue').textContent = life.current !== '' ? life.current + '/' + life.max + ' 年' : '--/-- 年';
+        const hpPct = hp.max > 0 && hp.current !== '' ? Math.round(hp.current / hp.max * 100) : 0;
+        const mpPct = mp.max > 0 && mp.current !== '' ? Math.round(mp.current / mp.max * 100) : 0;
+        const xpPct = charStats.breakthrough ? parseInt(charStats.breakthrough) : 0;
+        const lifePct = life.max > 0 && life.current !== '' ? Math.round(life.current / life.max * 100) : 0;
+        document.getElementById('hpBar').style.width = hpPct + '%';
+        document.getElementById('mpBar').style.width = mpPct + '%';
+        document.getElementById('xpBar').style.width = xpPct + '%';
+        document.getElementById('lifeBar').style.width = lifePct + '%';
+      const s = charStats.stats || {};
+      document.getElementById('rootValue').textContent = '❰ ' + (s.root || '--') + ' ❱';
+      document.getElementById('spiritValue').textContent = '❰ ' + (s.spirit || '--') + ' ❱';
+      document.getElementById('agilityValue').textContent = '❰ ' + (s.agility || '--') + ' ❱';
+      document.getElementById('insightValue').textContent = '❰ ' + (s.insight || '--') + ' ❱';
+      document.getElementById('luckValue').textContent = '❰ ' + (s.luck || '--') + ' ❱';
+      document.getElementById('charmValue').textContent = '❰ ' + (s.charm || '--') + ' ❱';
+    }
+
+    // ===== 输入框自适应 =====
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+    }
+    function handleKeyDown(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+    function autoResizeOpt(el) {
+      el.style.height = 'auto';
+      el.style.overflowY = 'hidden';
+      el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+      if (el.scrollHeight > 150) el.style.overflowY = 'auto';
+    }
+
+    // ===== 添加消息 =====
+    function addMessage(text, type) {
+      const chatContainer = document.getElementById('chatContainer');
+      const typingIndicator = document.getElementById('typingIndicator');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message ' + type;
+      messageDiv.textContent = text;
+      chatContainer.insertBefore(messageDiv, typingIndicator);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function showTyping(show) {
+      document.getElementById('typingIndicator').style.display = show ? 'block' : 'none';
+      document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
+    }
+
+    const FUNCTION_DEFS = [
+      {
+        name: "update_player_stats",
+        description: "Update player stats card values",
+        parameters: {
+          type: "object",
+          properties: {
+            hp: { type: "object", description: "HP current and max", properties: { current: { type: "number" }, max: { type: "number" } } },
+            mp: { type: "object", description: "MP current and max", properties: { current: { type: "number" }, max: { type: "number" } } },
+            realm: { type: "string", description: "Current cultivation realm" },
+            linggen: { type: "string", description: "Spirit root attribute" },
+            stones: { type: "string", description: "Number of spirit stones" },
+            status: { type: "string", description: "Current status" },
+            life: { type: "object", description: "Lifespan current and max", properties: { current: { type: "number" }, max: { type: "number" } } }
+          }
+        }
+      },
+      {
+        name: "update_player_name",
+        description: "Update player name and appearance",
+        parameters: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "Player name" },
+            appearance: { type: "string", description: "Player appearance" },
+            gender: { type: "string", description: "Player gender" }
+          }
+        }
+      },
+      {
+        name: "update_role_favor",
+        description: "Update favor with a specific role character",
+        parameters: {
+          type: "object",
+          properties: {
+            role_index: { type: "number", description: "Index of the role (0-based)" },
+            favor: { type: "number", description: "Favor value (can be negative for enemies)" }
+          }
+        }
+      },
+      {
+        name: "update_role_stats",
+        description: "Update a role character stats",
+        parameters: {
+          type: "object",
+          properties: {
+            role_index: { type: "number", description: "Index of the role (0-based)" },
+            hp: { type: "object", description: "HP current and max", properties: { current: { type: "number" }, max: { type: "number" } } },
+            mp: { type: "object", description: "MP current and max", properties: { current: { type: "number" }, max: { type: "number" } } },
+            realm: { type: "string", description: "Realm" },
+            breakthrough: { type: "string", description: "Breakthrough progress" }
+          }
+        }
+      },
+      {
+        name: "add_chat_options",
+        description: "Add option buttons to the chat interface. Must include body for text content and exactly 4 options with only msg field.",
+        parameters: {
+          type: "object",
+          properties: {
+            body: { type: "string", description: "The main text content to display" },
+            options: {
+              type: "array",
+              description: "Exactly 4 options, each with only msg field",
+              items: {
+                type: "object",
+                properties: {
+                  msg: { type: "string", description: "Option content" }
+                },
+                required: ["msg"],
+                additionalProperties: false
+              },
+              minItems: 4,
+              maxItems: 4
+            },
+              status: {
+              type: "object",
+              description: "状态卡增量更新。仅当内容有变化时携带，只写变化的字段；无变化则省略此参数。可用字段：name,gender,appearance,realm,linggen,status,stones,breakthrough,hp{current,max},mp{current,max},life{current,max},stats{root,spirit,agility,insight,luck,charm}",
+              properties: {
+                name: { type: "string" }, gender: { type: "string" }, appearance: { type: "string" },
+                realm: { type: "string" }, linggen: { type: "string" }, status: { type: "string" },
+                stones: { type: "string" }, breakthrough: { type: "string" },
+                hp: { type: "object", properties: { current: { type: ["string","number"] }, max: { type: ["string","number"] } } },
+                mp: { type: "object", properties: { current: { type: ["string","number"] }, max: { type: ["string","number"] } } },
+                life: { type: "object", properties: { current: { type: ["string","number"], description: "当前年龄，不是剩余寿元"}, max: { type: ["string","number"] } } },
+                stats: { type: "object", properties: { root: { type: "string" }, spirit: { type: "string" }, agility: { type: "string" }, insight: { type: "string" }, luck: { type: "string" }, charm: { type: "string" } } }
+              },
+              additionalProperties: false
+            },
+            roles: {
+              type: "array",
+              description: "重要角色增量更新。仅当内容有变化时携带；每项 {index, ...变化字段}，index 从0开始（0=role1.json），新增角色省略 index；无变化则省略此参数。可用字段：name,gender,appearance,realm,linggen,status,stones,breakthrough,favor,hp{current,max},mp{current,max},life{current,max},stats{root,spirit,agility,insight,luck,charm}",
+              items: {
+                type: "object",
+                properties: {
+                  index: { type: "number", description: "0-based，0=role1.json；新增角色时省略" },
+                  name: { type: "string" }, gender: { type: "string" }, appearance: { type: "string" },
+                  realm: { type: "string" }, linggen: { type: "string" }, status: { type: "string" },
+                  stones: { type: "string" }, breakthrough: { type: "string" }, favor: { type: "number" },
+                  hp: { type: "object", properties: { current: { type: ["string","number"] }, max: { type: ["string","number"] } } },
+                  mp: { type: "object", properties: { current: { type: ["string","number"] }, max: { type: ["string","number"] } } },
+                  life: { type: "object", properties: { current: { type: ["string","number"] }, max: { type: ["string","number"] } } },
+                  stats: { type: "object", properties: { root: { type: "string" }, spirit: { type: "string" }, agility: { type: "string" }, insight: { type: "string" }, luck: { type: "string" }, charm: { type: "string" } } }
+                }
+              }
+            },
+            dao: {
+              type: "object",
+              description: "悟道增量更新。仅当内容有变化时携带；circles 改 dao_config.json 条目（按 name=circle_N 匹配，可改 unlocked/cost/costRatio/label/desc/comment），configs 改对应 circle_N.json（键为 circle_N，值为 name/desc/comment/cost/unlocked 的变化部分）；无变化则省略此参数",
+              properties: {
+                circles: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string", description: "circle_1/circle_2/circle_3" },
+                      label: { type: "string" }, unlocked: { type: "boolean" },
+                      cost: { type: "string" }, costRatio: { type: "number" },
+                      desc: { type: "string" }, comment: { type: "string" }
+                    },
+                    required: ["name"]
+                  }
+                },
+                configs: {
+                  type: "object",
+                  additionalProperties: {
+                    type: "object",
+                    properties: {
+                      name: { type: "string" }, desc: { type: "string" }, comment: { type: "string" },
+                      cost: { type: "string" }, unlocked: { type: "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          required: ["body", "options"]
+        }
+      }
+    ];
+
+    function lenientParse(buf) {
+      if (!buf || buf.length < 2) return null;
+      try { return JSON.parse(buf); } catch (e) {}
+      let s = buf.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
+      try { return JSON.parse(s); } catch (e) {}
+      s = s.replace(/([{,]\s*)([A-Za-z_$][A-Za-z0-9_$]*)(\s*):/g, '$1"$2"$3:');
+      try { return JSON.parse(s); } catch (e) {}
+      s = buf.replace(/'/g, '"');
+      try { return JSON.parse(s); } catch (e) {}
+      // 先修内层未转义引号/裸换行，再基于修复后的串做截断补全
+      const repaired = repairInnerQuotes(buf);
+      try { return JSON.parse(repaired); } catch (e) {}
+      try {
+        let inStr = false, esc = false;
+        const stack = [];
+        for (const ch of repaired) {
+          if (inStr) {
+            if (esc) esc = false;
+            else if (ch === '\\') esc = true;
+            else if (ch === '"') inStr = false;
+          } else {
+            if (ch === '"') inStr = true;
+            else if (ch === '{' || ch === '[') stack.push(ch);
+            else if (ch === '}') stack.pop();
+            else if (ch === ']') stack.pop();
+          }
+        }
+        let out = repaired;
+        if (inStr) out += '"';
+        out = out.replace(/,\s*$/, '').replace(/:\s*$/, ':""');
+        for (let i = stack.length - 1; i >= 0; i--) out += stack[i] === '{' ? '}' : ']';
+        if (out !== repaired) return JSON.parse(out);
+      } catch (e) {}
+      return null;
+    }
+
+    function repairInnerQuotes(s) {
+      if (!s) return '';
+      let out = '', inStr = false, esc = false;
+      for (let i = 0; i < s.length; i++) {
+        const ch = s[i];
+        if (esc) { out += ch; esc = false; continue; }
+        if (ch === '\\') { out += ch; esc = true; continue; }
+        if (ch === '"') {
+          if (!inStr) { inStr = true; out += ch; continue; }
+          let j = i + 1;
+          while (j < s.length && ' \t\n\r'.includes(s[j])) j++;
+          const next = s[j];
+          if (next === ',' || next === '}' || next === ']' || next === ':' || next === undefined) {
+            inStr = false; out += ch;
+          } else {
+            out += '\\"';
+          }
+          continue;
+        }
+        if (inStr && ch === '\n') { out += '\\n'; continue; }
+        out += ch;
+      }
+      return out;
+    }
+
+    function executeFunction(name, args) {
+      try {
+        switch(name) {
+          case "update_player_stats":
+            if (args.hp) charStats.hp = args.hp;
+            if (args.mp) charStats.mp = args.mp;
+            if (args.realm) charStats.realm = args.realm;
+            if (args.linggen) charStats.linggen = args.linggen;
+            if (args.stones) charStats.stones = args.stones;
+            if (args.status) charStats.status = args.status;
+            if (args.life) charStats.life = args.life;
+            if (args.stats) charStats.stats = args.stats;
+            updateStatsUI();
+            return JSON.stringify({ ok: true });
+          case "update_player_name":
+            if (args.name) charStats.name = args.name;
+            if (args.appearance) charStats.appearance = args.appearance;
+            if (args.gender) charStats.gender = args.gender;
+            updateStatsUI();
+            return JSON.stringify({ ok: true });
+          case "update_role_favor":
+            if (roles[args.role_index]) {
+              roles[args.role_index].favor = args.favor;
+            }
+            loadAllRoles();
+            return JSON.stringify({ ok: true });
+          case "update_role_stats":
+            if (roles[args.role_index]) {
+              if (args.hp) roles[args.role_index].hp = args.hp;
+              if (args.mp) roles[args.role_index].mp = args.mp;
+              if (args.realm) roles[args.role_index].realm = args.realm;
+              if (args.breakthrough) roles[args.role_index].breakthrough = args.breakthrough;
+            }
+            loadAllRoles();
+            return JSON.stringify({ ok: true });
+          case "add_chat_options":
+            // 显示正文（重复执行时相同正文不重复插入）
+            if (args.body && args.body.trim()) {
+              const lastEntry = chatHistory[chatHistory.length - 1];
+              if (!lastEntry || lastEntry.content !== args.body) {
+                const chatContainer = document.getElementById('chatContainer');
+                const typingIndicator = document.getElementById('typingIndicator');
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'message ai';
+                bodyDiv.textContent = args.body;
+                chatContainer.insertBefore(bodyDiv, typingIndicator);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                chatHistory.push({ role: 'assistant', content: args.body });
+              }
+            }
+            
+            // 渲染选项
+            const row = document.getElementById("optionsRow");
+            if (row) {
+              row.innerHTML = "";
+              for (const opt of (args.options || [])) {
+                if (!opt || !opt.msg) continue;
+                const msg = opt.msg;
+                const btn = document.createElement("button");
+                btn.className = "opt-btn";
+                btn.textContent = msg;
+                btn.onclick = () => sendOption(msg, msg);
+                row.appendChild(btn);
+                autoResizeOpt(btn);
+              }
+            }
+
+            lastUpdatedSections = [];
+            // status 归一化：标准对象 / 顶层拍平 / status 传成字符串，三种形态都能合并
+            if (!args.status && Array.isArray(args.options)) {
+              for (const o of args.options) {
+                if (o && o.status && typeof o.status === 'object' && Object.keys(o.status).length) {
+                  args.status = o.status; break;
+                }
+              }
+            }
+            const STATUS_FIELDS = ["name","gender","appearance","realm","linggen","status","stones","breakthrough","hp","mp","life","stats","xp"];
+            let statusDelta = (args.status && typeof args.status === "object") ? Object.assign({}, args.status) : {};
+            if (typeof args.status === "string") statusDelta.status = args.status;
+            for (const k of STATUS_FIELDS) {
+              if (k === "status") continue; // 参数 status 本体（对象形态）不重复收集；字符串形态已在上面处理
+              if (args[k] !== undefined) statusDelta[k] = args[k];
+            }
+            if (Object.keys(statusDelta).length) {
+              mergeObject(charStats, statusDelta);
+              updateStatsUI();
+              lastUpdatedSections.push('status');
+            }
+            if (Array.isArray(args.roles) && args.roles.length) {
+              applyRoleDeltas(args.roles);
+              loadAllRoles();
+              lastUpdatedSections.push('roles');
+            }
+            if (args.dao && (Array.isArray(args.dao.circles) || (args.dao.configs && Object.keys(args.dao.configs).length))) {
+              applyDaoDeltas(args.dao);
+              lastUpdatedSections.push('dao');
+            }
+            
+            console.log('[TOOL] add_chat_options 执行完成');
+            return JSON.stringify({ ok: true });
+          default:
+          return JSON.stringify({ error: "Unknown function: " + name });
+        }
+      } catch(e) {
+        return JSON.stringify({ error: e.message });
+      }
+    }
+
+    function showFunctionResult(name, args, result) {
+      const chatContainer = document.getElementById("chatContainer");
+      const typingIndicator = document.getElementById("typingIndicator");
+      const div = document.createElement("div");
+      div.className = "message func-result";
+      let summary = "";
+      if (name === "update_player_stats") {
+        summary = "Player: " + (args.realm || "--") + " | HP: " + (args.hp ? args.hp.current : "--") + "/" + (args.hp ? args.hp.max : "--");
+      } else if (name === "update_player_name") {
+        summary = "Name: " + (args.name || charStats.name || "--") + " | " + (args.appearance || charStats.appearance || "");
+      } else if (name === "update_role_favor") {
+        const rname = roles[args.role_index] ? roles[args.role_index].name : "Role" + args.role_index;
+        summary = rname + " favor: " + args.favor;
+      } else if (name === "update_role_stats") {
+        const rname = roles[args.role_index] ? roles[args.role_index].name : "Role" + args.role_index;
+        summary = rname + " updated";
+      } else if (name === "add_chat_options") {
+        summary = "Options added: " + (args.options || []).length + (lastUpdatedSections.length ? " | 更新: " + lastUpdatedSections.join(', ') : "");
+      }
+      div.textContent = "[Function] " + name + "(" + summary + ")";
+      chatContainer.insertBefore(div, typingIndicator);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function getMessagesWithSystem() {
+      const activeSettingId = localStorage.getItem('activeSettingId');
+      const settings = JSON.parse(localStorage.getItem('settingsList') || '[]');
+      const activeSetting = settings.find(s => s.id === activeSettingId);
+      let msgs = [];
+      const formatInstruction = '【强制要求】你必须且只能调用 add_chat_options 工具，不能在工具外输出任何内容。工具参数：{"body":"所有正文内容","options":[{"msg":"选项1"},{"msg":"选项2"},{"msg":"选项3"},{"msg":"选项4"}]}。正文必须全部放在 body 字段且和msg每轮必须含内容，禁止直接输出文字。status/roles/dao 是增量参数，仅在对应板块本轮有变化时携带，且只写变化的字段；无变化的板块必须省略对应参数，禁止重复传未变更的值。角色六维则放在 roles 对应项的 stats 里；仅当本轮六维确实无任何变化时才可省略。禁止出现英文双引号 "，引用台词一律用「」或“”中文引号。roles 只用于重要角色：仅当好感度<0（敌对）或>70（亲近）时才可把该角色放入 roles；好感度在[0,70]的普通角色不要新放入 roles；已在 roles 中的重要角色即使好感度变化为[0,70]，仍照常更新其数据。';
+      if (activeSetting && activeSetting.content && activeSetting.content.trim()) {
+        msgs.push({ role: 'system', content: formatInstruction + '\n\n' + activeSetting.content });
+      } else {
+        msgs.push({ role: 'system', content: formatInstruction });
+      }
+      // 给每条 assistant 历史消息加格式提醒
+      const historyWithReminders = chatHistory.map((msg, i) => {
+        if (msg.role === 'assistant') {
+          return { ...msg, content: msg.content + '\n[请继续调用 add_chat_options 工具提供选项]' };
+        }
+        return msg;
+      });
+      return msgs.concat(historyWithReminders);
+    }
+
+
+    // ===== 发送消息 =====
+    async function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      const text = input.value.trim();
+      const isTestEmpty = text.startsWith('//testempty');
+      console.log('[SEND] 开始发送:', text.substring(0, 30));
+      if (!text) return;
+
+      input.disabled = true;
+      sendBtn.disabled = true;
+      showTyping(true);
+      addMessage(text, 'user');
+      chatHistory.push({ role: 'user', content: text });
+      input.value = '';
+      input.style.height = 'auto';
+
+      try {
+        const apiUrl = config.baseUrl.endsWith('/v1')
+          ? config.baseUrl + '/chat/completions'
+          : config.baseUrl + '/v1/chat/completions';
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + config.apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: config.modelName,
+            messages: getMessagesWithSystem(),
+            functions: FUNCTION_DEFS,
+            max_tokens: 65536,
+            stream: true
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || '请求失败: ' + response.status);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let aiMessage = '';
+        let toolBuffer = '';
+        let toolExecuted = false;
+        window._lastToolCallId = '';
+        const chatContainer = document.getElementById('chatContainer');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const streamMsgDiv = document.createElement('div');
+        streamMsgDiv.className = 'message ai';
+        chatContainer.insertBefore(streamMsgDiv, typingIndicator);
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') break;
+              try {
+                const json = JSON.parse(data);
+                const delta = json.choices[0].delta;
+                
+                // 处理工具调用
+                if (delta.tool_calls) {
+                  // 如果是新的 tool_call，清空 buffer
+                  if (delta.tool_calls[0].id !== window._lastToolCallId) {
+                    toolBuffer = '';
+                    window._lastToolCallId = delta.tool_calls[0].id;
+                  }
+                  for (const tc of delta.tool_calls) {
+                    if (tc.function && tc.function.arguments) {
+                      toolBuffer += tc.function.arguments;
+                    }
+                    // 实时尝试解析
+                    if (tc.finish_reason || toolBuffer.length > 20) {
+                      const testArgs = lenientParse(toolBuffer);
+                      if (testArgs) {
+                        console.log('[DEBUG] 实时解析成功:', testArgs);
+                        executeFunction('add_chat_options', testArgs);
+                        window._lastToolCallId = tc.id;
+                        toolExecuted = true;
+                      }
+                    }
+                  }
+                }
+                
+                // 流式显示正文
+                const content = delta.content;
+                if (content) {
+                  aiMessage += content;
+                  streamMsgDiv.textContent = aiMessage;
+                  chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        console.log('[SEND] 流结束, aiMessage长度:', aiMessage.length);
+        console.log('[SEND] toolBuffer长度:', toolBuffer.length);
+        console.log('[SEND] toolBuffer前50字:', toolBuffer.substring(0, 50));
+          if (!toolExecuted && toolBuffer.length > 20) {
+          const finalArgs = lenientParse(toolBuffer);
+          if (finalArgs) {
+            console.log('[DEBUG] 流结束兜底解析成功，执行工具');
+            executeFunction('add_chat_options', finalArgs);
+          } else {
+            try { JSON.parse(toolBuffer); } catch (e2) {
+              const mm = e2.message.match(/position (\d+)/);
+              const pos = mm ? +mm[1] : 0;
+              console.error('[SEND] 解析错误:', e2.message, '出错位置上下文:', JSON.stringify(toolBuffer.slice(Math.max(0, pos - 40), pos + 40)));
+            }
+            console.error('[SEND] 工具参数最终解析失败，完整缓冲内容:', toolBuffer);
+          }
+        }
+
+        // 隐藏空的 streamMsgDiv
+        if (streamMsgDiv && streamMsgDiv.parentNode) {
+          streamMsgDiv.remove();
+        }
+        
+        // 如果 AI 只调用了工具没有正文，不报错
+        if (!isTestEmpty && aiMessage.trim()) {
+          chatHistory.push({ role: 'assistant', content: aiMessage });
+        }
+        // 如果 aiMessage 为空但工具执行了，不显示错误
+      } catch (error) {
+        addMessage('错误: ' + error.message, 'error');
+        console.error('发送失败:', error);
+      } finally {
+        input.disabled = false;
+        sendBtn.disabled = false;
+        showTyping(false);
+        input.focus();
+      }
+    }
+
+    // ===== 悟道系统 =====
+    let daoCircles = [];
+    let selectedCircleId = null;
+    let daoConfigs = {};
+
+    async function loadDaoCircles() {
+      try {
+        const res = await fetch('ztk/wd/dao_config.json');
+        if (res.ok) {
+          daoCircles = await res.json();
+        }
+      } catch(e) {
+        daoCircles = getDefaultDaoCircles();
+      }
+      for (const c of daoCircles) {
+        try {
+          const r = await fetch('ztk/wd/' + c.path + '.json');
+          if (r.ok) daoConfigs[c.path] = await r.json();
+        } catch(e) {}
+      }
+      renderDaoCircles();
+    }
+
+      function getDefaultDaoCircles() {
+      return [
+        { id:1, name:"circle_1", label:"第一重天", desc:"先天一炁，混元归一", comment:"起始悟道节点", cost:"1/1", costRatio:0, unlocked:false, prereq:null, path:"circle_1" },
+        { id:2, name:"circle_2", label:"第二重天", desc:"阴阳交感，万物化生", comment:"需第一重天完成后解锁", cost:"3/5", costRatio:0, unlocked:false, prereq:"circle_1", path:"circle_2" },
+        { id:3, name:"circle_3", label:"第三重天", desc:"三才具足，大道可期", comment:"需前两层完成后解锁", cost:"5/8", costRatio:0, unlocked:false, prereq:"circle_2", path:"circle_3" }
+      ];
+    }
+
+    function createCircleSVG(circle) {
+      const isGolden = circle.costRatio === 1.0;
+      const color = isGolden ? '#ffd700' : '#222';
+      const strokeColor = isGolden ? '#ffd700' : '#222';
+      const dotColor = isGolden ? '#ffd700' : '#666';
+      const goldenCls = isGolden ? 'golden' : '';
+      return `<svg class="dao-circle-svg${goldenCls}" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="80" cy="80" r="70" fill="rgba(20,20,20,0.8)" stroke="${color}" stroke-width="2" opacity="0.6"/>
+        <g class="dao-twist-group-cw">
+          <ellipse cx="80" cy="80" rx="60" ry="25" fill="none" stroke="${strokeColor}" stroke-width="5" class="dao-twist-line" opacity="0.9"/>
+        </g>
+        <g class="dao-twist-group-ccw">
+          <ellipse cx="80" cy="80" rx="25" ry="60" fill="none" stroke="${strokeColor}" stroke-width="5" class="dao-twist-line" opacity="0.9"/>
+        </g>
+        <circle cx="80" cy="80" r="6" fill="${isGolden ? '#ffd700' : '#888'}" opacity="0.8"/>
+        <circle cx="80" cy="10" r="3" fill="${dotColor}" opacity="0.5"/>
+        <circle cx="80" cy="150" r="3" fill="${dotColor}" opacity="0.5"/>
+        <circle cx="10" cy="80" r="3" fill="${dotColor}" opacity="0.5"/>
+        <circle cx="150" cy="80" r="3" fill="${dotColor}" opacity="0.5"/>
+      </svg>`;
+    }
+
+    function renderDaoCircles() {
+      const wrap = document.getElementById('daoCirclesWrap');
+      wrap.innerHTML = '';
+      for (const c of daoCircles) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dao-circle-wrapper' + (c.unlocked ? ' unlocked' : ' locked');
+        wrapper.dataset.id = c.id;
+        wrapper.innerHTML = createCircleSVG(c) + `<div class="dao-circle-label ${c.unlocked ? 'unlocked' : 'locked-label'}">${c.unlocked ? c.label : '???'}</div>`;
+        wrapper.onclick = () => onCircleClick(c);
+        wrap.appendChild(wrapper);
+      }
+    }
+
+    function onCircleClick(circle) {
+      if (!circle.unlocked) return;
+      selectedCircleId = circle.id;
+      const panel = document.getElementById('daoConfigPanel');
+      const cfg = daoConfigs[circle.path] || {};
+      document.getElementById('daoPanelTitle').textContent = circle.label + ' - 配置详情';
+      document.getElementById('daoFieldName').textContent = cfg.name || '()';
+      document.getElementById('daoFieldDesc').textContent = cfg.desc || '()';
+      document.getElementById('daoFieldComment').textContent = cfg.comment || '()';
+      document.getElementById('daoFieldCost').textContent = circle.cost + (circle.costRatio === 1.0 ? ' (已激活)' : '');
+      panel.classList.add('show');
+    }
+
+    loadDaoCircles();
+
+    // ===== 初始化 =====
+    loadStats();
+    loadAllRoles();
+    updateModelInfo();
+    loadOptions();
+  
+
+  
+    // ===== 个性化背景 =====
+    function openCustom() {
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000;';
+      const modal = document.createElement('div');
+      modal.style.cssText = 'background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:30px;max-width:400px;width:90%;color:white;';
+      var html = '<h2 style="text-align:center;margin-bottom:20px;color:#00ff88;">个性化背景</h2>';
+      html += '<div style="margin-bottom:15px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;">';
+      html += '<div style="font-size:16px;margin-bottom:10px;">选择预设背景：</div>';
+      html += '<div style="display:flex;gap:10px;flex-wrap:wrap;">';
+      html += '<img src="a.jpg" onclick="setBg(`a.jpg`)" style="width:80px;height:60px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;" onmouseover="this.style.borderColor=`#00ff88`" onmouseout="this.style.borderColor=`transparent`;">';
+      html += '</div></div>';
+      html += '<div style="margin-bottom:15px;padding:15px;background:rgba(255,255,255,0.05);border-radius:10px;">';
+      html += '<div style="font-size:16px;margin-bottom:10px;">上传自定义背景：</div>';
+      html += '<input type="file" id="bgUpload" accept="image/*" onchange="uploadBg(event)" style="color:white;font-size:14px;"></div>';
+      html += '<button onclick="this.closest(`div[style]`).parentElement.remove()" style="width:100%;padding:12px;background:linear-gradient(135deg,#00d4ff,#0099cc);border:none;border-radius:10px;color:white;font-size:16px;cursor:pointer;">关闭</button>';
+      modal.innerHTML = html;
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    }
+    function setBg(url) {
+      document.body.style.backgroundImage = "url('" + url + "')";
+      localStorage.setItem("customBg", url);
+      if (url === "b.png" || !url.startsWith("http")) {
+        localStorage.removeItem("customBgData");
+      }
+    }
+    function uploadBg(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result;
+        document.body.style.backgroundImage = "url('" + dataUrl + "')";
+        localStorage.setItem("customBg", dataUrl);
+        localStorage.setItem("customBgData", dataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+    // 恢复背景
+    (function() {
+      const savedBg = localStorage.getItem("customBg");
+      const savedBgData = localStorage.getItem("customBgData");
+      if (savedBgData) {
+        document.body.style.backgroundImage = "url('" + savedBgData + "')";
+      } else if (savedBg) {
+        document.body.style.backgroundImage = "url('" + savedBg + "')";
+      }
+    })();
+
+    // ===== 选项按钮 =====
+    async function loadOptions() {
+      try {
+        const res = await fetch('xx/options.json');
+        if (res.ok) {
+          const opts = await res.json();
+          const row = document.getElementById('optionsRow');
+          row.innerHTML = '';
+          for (const opt of opts) {
+            if (!opt || (!opt.text && !opt.msg)) continue;
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.textContent = opt.text || '';
+            btn.onclick = () => sendOption(opt.msg || opt.text || '', opt.text || '');
+            row.appendChild(btn);
+          }
+        }
+      } catch(e) {}
+    }
+    function sendOption(msg, optText) {
+      if (!msg) return;
+      var attr = window.rollDiceIfNeeded(optText || msg);
+      window._lastAttr = attr;
+      window._lastOptionText = optText || msg;
+      window._lastPrevMsg = getLastMessage();
+      if (attr) {
+        var origMsg = msg;
+        var checkInterval = setInterval(function() {
+          var result = document.getElementById("diceResult").textContent;
+          if (result && result !== "") {
+            clearInterval(checkInterval);
+            var rolledMsg = origMsg + "（投出 " + result + " 点）";
+            document.getElementById("messageInput").value = rolledMsg;
+            sendMessage();
+          }
+        }, 300);
+      } else {
+        document.getElementById("messageInput").value = msg;
+        sendMessage();
+      }
+    }
+
+
+    // ===== 存档/读档系统 =====
+    const SAVE_SLOTS = ["c1","c2","c3","c4","c5"];
+    var saveListCache = [];
+
+    async function showSaveLoadUI() {
+      var overlay = document.createElement("div");
+      overlay.id = "saveLoadOverlay";
+      overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:2000;";
+      var html = "<div style=\"background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:30px;max-width:520px;width:90%;color:white;\">";
+      html += "<h2 style=\"text-align:center;margin-bottom:20px;color:#00d4ff;\">存档 / 读档</h2>";
+      html += "<div style=\"display:flex;gap:10px;margin-bottom:15px;justify-content:center;\">";
+      html += "<button id=\"tabSave\" onclick=\"switchSaveTab('save')\" style=\"padding:8px 20px;background:rgba(0,212,255,0.2);border:1px solid rgba(0,212,255,0.5);border-radius:8px;color:white;cursor:pointer;\">存档</button>";
+      html += "<button id=\"tabLoad\" onclick=\"switchSaveTab('load')\" style=\"padding:8px 20px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;cursor:pointer;\">读档</button>";
+      html += "</div>";
+      html += "<div id=\"saveContent\" style=\"display:block;\"></div>";
+      html += "<div id=\"loadContent\" style=\"display:none;\"></div>";
+      html += "<div style=\"text-align:center;margin-top:20px;\">";
+      html += "<button onclick=\"closeSaveLoadUI()\" style=\"padding:10px 30px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:white;cursor:pointer;\">关闭</button>";
+      html += "</div></div>";
+      overlay.innerHTML = html;
+      document.body.appendChild(overlay);
+      overlay.onclick = function(e) { if (e.target === overlay) closeSaveLoadUI(); };
+      await refreshSaveList();
+      switchSaveTab("save");
+    }
+
+    function closeSaveLoadUI() {
+      var overlay = document.getElementById("saveLoadOverlay");
+      if (overlay) overlay.remove();
+    }
+
+    function switchSaveTab(tab) {
+      var t1 = document.getElementById("tabSave");
+      var t2 = document.getElementById("tabLoad");
+      if (!t1 || !t2) return;
+      t1.style.background = tab === "save" ? "rgba(0,212,255,0.2)" : "rgba(255,255,255,0.1)";
+      t1.style.borderColor = tab === "save" ? "rgba(0,212,255,0.5)" : "rgba(255,255,255,0.2)";
+      t2.style.background = tab === "load" ? "rgba(0,212,255,0.2)" : "rgba(255,255,255,0.1)";
+      t2.style.borderColor = tab === "load" ? "rgba(0,212,255,0.5)" : "rgba(255,255,255,0.2)";
+      if (tab === "save") renderSaveSlots();
+      else renderLoadSlots();
+    }
+
+    async function refreshSaveList() {
+      try {
+        var res = await fetch("http://localhost:3000/api/saves");
+        saveListCache = res.ok ? await res.json() : [];
+      } catch(e) { saveListCache = []; }
+    }
+
+    function getSlotInfo(slot) {
+      for (var i = 0; i < saveListCache.length; i++) {
+        if (saveListCache[i].slot === slot) return saveListCache[i];
+      }
+      return null;
+    }
+
+    function renderSaveSlots() {
+      var container = document.getElementById("saveContent");
+      container.style.display = "block";
+      var lc = document.getElementById("loadContent");
+      if (lc) lc.style.display = "none";
+      var html = "<div style=\"display:grid;grid-template-columns:repeat(5,1fr);gap:10px;\">";
+      for (var i = 0; i < SAVE_SLOTS.length; i++) {
+        var slot = SAVE_SLOTS[i];
+        var info = getSlotInfo(slot);
+        var hasSave = info !== null;
+        var timeStr = hasSave ? (info.timestamp || "").slice(0, 16).replace("T", " ") : "空";
+        html += "<div style=\"text-align:center;\">";
+        html += "<div style=\"font-size:14px;font-weight:bold;margin-bottom:4px;\">存档" + slot + "</div>";
+        html += "<div style=\"font-size:11px;opacity:0.6;margin-bottom:8px;\" title=\"" + timeStr + "\">" + timeStr + "</div>";
+        html += "<button onclick=\"saveGame('" + slot + "')\" style=\"width:100%;padding:10px 4px;background:" + (hasSave ? "rgba(255,100,100,0.15)" : "rgba(0,255,136,0.1)") + ";border:1px solid " + (hasSave ? "rgba(255,100,100,0.4)" : "rgba(0,255,136,0.3)") + ";border-radius:10px;color:" + (hasSave ? "#ff6b6b" : "#00ff88") + ";cursor:pointer;font-size:12px;\">" + (hasSave ? "覆盖存档" : "点击存档") + "</button>";
+        html += "</div>";
+      }
+      html += "</div>";
+      html += "<p style=\"text-align:center;font-size:11px;opacity:0.4;margin-top:12px;\">存档保存在 server/saves/ 目录下</p>";
+      container.innerHTML = html;
+    }
+
+    function renderLoadSlots() {
+      var container = document.getElementById("loadContent");
+      container.style.display = "block";
+      var sc = document.getElementById("saveContent");
+      if (sc) sc.style.display = "none";
+      var html = "<div style=\"display:grid;grid-template-columns:repeat(5,1fr);gap:10px;\">";
+      for (var i = 0; i < SAVE_SLOTS.length; i++) {
+        var slot = SAVE_SLOTS[i];
+        var info = getSlotInfo(slot);
+        var hasSave = info !== null;
+        var timeStr = hasSave ? (info.timestamp || "").slice(0, 16).replace("T", " ") : "空";
+        var msgCount = hasSave ? (info.chatCount || 0) : 0;
+        html += "<div style=\"text-align:center;\">";
+        html += "<div style=\"font-size:14px;font-weight:bold;margin-bottom:4px;\">读档" + slot + "</div>";
+        html += "<div style=\"font-size:11px;opacity:0.6;margin-bottom:8px;\" title=\"" + timeStr + "\">" + timeStr + (hasSave ? " · " + msgCount + "条消息" : "") + "</div>";
+        html += "<button onclick=\"loadGame('" + slot + "')\" style=\"width:100%;padding:10px 4px;background:" + (hasSave ? "rgba(0,212,255,0.15)" : "rgba(255,255,255,0.05)") + ";border:1px solid " + (hasSave ? "rgba(0,212,255,0.4)" : "rgba(255,255,255,0.15)") + ";border-radius:10px;color:" + (hasSave ? "#00d4ff" : "rgba(255,255,255,0.3)") + ";cursor:" + (hasSave ? "pointer" : "not-allowed") + ";opacity:" + (hasSave ? "1" : "0.5") + ";font-size:12px;\"" + (hasSave ? "读取存档" : "无存档") + "</button>";
+        html += "</div>";
+      }
+      html += "</div>";
+      html += "<p style=\"text-align:center;font-size:11px;opacity:0.4;margin-top:12px;\">读取后将替换当前所有数据</p>";
+      container.innerHTML = html;
+    }
+
+    const API_BASE = "http://localhost:3000/api";
+
+    async function saveGame(slot) {
+      try {
+        var statsJson = JSON.stringify(charStats, null, 2);
+        var daoConfigJson = JSON.stringify(daoCircles, null, 2);
+        var rolesJson = JSON.stringify(roles, null, 2);
+        var chatLog = "";
+        if (chatHistory && chatHistory.length > 0) {
+          for (var i = 0; i < chatHistory.length; i++) {
+            var msg = chatHistory[i];
+            var role = msg.role === "user" ? "玩家" : "AI";
+            chatLog += role + ": " + msg.content + "\n\n";
+          }
+        }
+        var data = {
+          version: "1.0",
+          slot: slot,
+          timestamp: new Date().toISOString(),
+          stats: statsJson,
+          daoConfig: daoConfigJson,
+          daoCircles: JSON.stringify(daoConfigs, null, 2),
+          roles: rolesJson,
+          chatLog: chatLog
+        };
+        var res = await fetch(API_BASE + "/save/" + slot, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (res.ok) {
+          await refreshSaveList();
+          renderSaveSlots();
+          updateStatsUI();
+          loadAllRoles();
+          renderDaoCircles();
+          alert("存档 " + slot + " 成功！");
+        } else {
+          alert("存档失败，请确认后端服务已启动");
+        }
+      } catch(e) {
+        alert("存档失败: " + e.message);
+      }
+    }
+
+    async function loadGame(slot) {
+      try {
+        var res = await fetch(API_BASE + "/load/" + slot);
+        if (!res.ok) {
+          alert("存档 " + slot + " 不存在");
+          return;
+        }
+        var data = await res.json();
+        if (data.stats) charStats = JSON.parse(data.stats);
+        if (data.daoConfig) daoCircles = JSON.parse(data.daoConfig);
+        if (data.daoCircles) daoConfigs = JSON.parse(data.daoCircles);
+        if (data.roles) {
+          roles.length = 0;
+          var loadedRoles = JSON.parse(data.roles);
+          for (var i = 0; i < loadedRoles.length; i++) roles.push(loadedRoles[i]);
+        }
+        chatHistory = [];
+        var chatContainer = document.getElementById("chatContainer");
+        var typingIndicator = document.getElementById("typingIndicator");
+        chatContainer.innerHTML = "";
+        chatContainer.appendChild(typingIndicator);
+        if (data.chatLog) {
+          var allLines = data.chatLog.split("\n");
+          var curRole = null;
+          var curContent = [];
+          function flushMsg() {
+            if (curRole && curContent.length > 0) {
+              chatHistory.push({role: curRole, content: curContent.join("\n").trim()});
+            }
+            curRole = null;
+            curContent = [];
+          }
+          for (var j = 0; j < allLines.length; j++) {
+            var line = allLines[j];
+            if (line.startsWith("玩家:")) {
+              flushMsg();
+              curRole = "user";
+              curContent.push(line.substring(3));
+            } else if (line.startsWith("AI:")) {
+              flushMsg();
+              curRole = "assistant";
+              curContent.push(line.substring(3));
+            } else if (curRole !== null) {
+              curContent.push(line);
+            }
+          }
+          flushMsg();
+          for (var k = 0; k < chatHistory.length; k++) {
+            var msg = chatHistory[k];
+            var div = document.createElement("div");
+            div.className = "message " + (msg.role === "user" ? "user" : "ai");
+            div.textContent = msg.content;
+            chatContainer.insertBefore(div, typingIndicator);
+          }
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        updateStatsUI();
+        loadAllRoles();
+        renderDaoCircles();
+        window.updateQichaStatus();
+        alert("读档 " + slot + " 成功！");
+      } catch(e) {
+        alert("读档失败: " + e.message);
+      }
+    }
+
+    function searchMessages(e) {
+      if (e) e.preventDefault();
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      const chatContainer = document.getElementById('chatContainer');
+      const messages = document.querySelectorAll('#chatContainer .message');
+      messages.forEach(function(m) {
+        if (!query) {
+          if (m.dataset.origHtml) { m.innerHTML = m.dataset.origHtml; delete m.dataset.origHtml; }
+          m.style.display = '';
+          return;
+        }
+        const text = m.textContent;
+        const lowerText = text.toLowerCase();
+        const idx = lowerText.indexOf(query);
+        if (idx === -1) { m.style.display = 'none'; return; }
+        m.style.display = '';
+        if (!m.dataset.origHtml) m.dataset.origHtml = m.innerHTML;
+        const before = text.slice(0, idx);
+        const match = text.slice(idx, idx + query.length);
+        const after = text.slice(idx + query.length);
+        m.innerHTML = escHtml(before) + '<mark style="background:#ff4444;color:white;border-radius:2px;padding:0 2px;">' + escHtml(match) + '</mark>' + escHtml(after);
+      });
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+    function escHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+
+
+    // ===== 页面初始化 =====
+    updateModelInfo();
+    loadStats();
+
+</script>
+<!-- ===== 骰子系统 (from tou.html) ===== -->
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<div id="diceOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;">
+  <div style="color:#ffd700;font-size:22px;font-weight:900;margin-bottom:12px;text-shadow:0 0 20px rgba(255,215,0,0.8);" id="diceAttrLabel"></div>
+  <canvas id="diceCanvas" width="320" height="320" style="cursor:pointer;"></canvas>
+  <div id="diceResult" style="margin-top:16px;font-size:44px;font-weight:900;color:#ffd700;text-shadow:0 0 30px rgba(255,215,0,0.8),0 0 60px rgba(255,180,0,0.4);min-height:54px;letter-spacing:2px;"></div>
+  <div style="margin-top:8px;color:rgba(200,180,255,0.45);font-size:13px;">点击骰子投掷</div>
+</div>
+<script>
+(function() {
+  var diceOverlay = document.getElementById("diceOverlay");
+  var diceAttrLabel = document.getElementById("diceAttrLabel");
+  var diceResult = document.getElementById("diceResult");
+  var diceCanvas = document.getElementById("diceCanvas");
+
+  var scene, camera, renderer, dice, isRolling = false, hasRolled = false;
+
+  function initDice() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0, 5);
+    renderer = new THREE.WebGLRenderer({ canvas: diceCanvas, antialias: true, alpha: true });
+    renderer.setSize(320, 320);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    var dl = new THREE.DirectionalLight(0xffffff, 1.4);
+    dl.position.set(3, 5, 4);
+    scene.add(dl);
+    var pl = new THREE.PointLight(0xff4444, 0.8, 20);
+    pl.position.set(-3, 2, 3);
+    scene.add(pl);
+    var geo = new THREE.IcosahedronGeometry(1.3, 0);
+    var normAttr = geo.getAttribute("normal");
+    var faceCount = geo.index ? geo.index.count / 3 : normAttr.count / 3;
+    var mat = new THREE.MeshPhysicalMaterial({ color: 0xcc2233, roughness: 0.2, metalness: 0.1, clearcoat: 0.8, clearcoatRoughness: 0.1, flatShading: true });
+    var edgesGeo = new THREE.EdgesGeometry(geo);
+    var edgesMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 });
+    var edges = new THREE.LineSegments(edgesGeo, edgesMat);
+    dice = new THREE.Group();
+    var mesh = new THREE.Mesh(geo, mat);
+    dice.add(mesh);
+    dice.add(edges);
+    scene.add(dice);
+    function makeNumberTexture(n) {
+      var c = document.createElement("canvas");
+      c.width = 128; c.height = 128;
+      var ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, 128, 128);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 72px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(0,0,0,0.8)";
+      ctx.shadowBlur = 10;
+      ctx.fillText(String(n), 64, 64);
+      var tex = new THREE.CanvasTexture(c);
+      tex.minFilter = THREE.LinearFilter;
+      return tex;
+    }
+    var posAttr = geo.getAttribute("position");
+    var faceCenters = [];
+    for (var i = 0; i < faceCount; i++) {
+      var cx = (posAttr.getX(i * 3) + posAttr.getX(i * 3 + 1) + posAttr.getX(i * 3 + 2)) / 3;
+      var cy = (posAttr.getY(i * 3) + posAttr.getY(i * 3 + 1) + posAttr.getY(i * 3 + 2)) / 3;
+      var cz = (posAttr.getZ(i * 3) + posAttr.getZ(i * 3 + 1) + posAttr.getZ(i * 3 + 2)) / 3;
+      faceCenters.push(new THREE.Vector3(cx, cy, cz));
+    }
+    for (var si = 0; si < faceCount; si++) {
+      var planeGeo = new THREE.PlaneGeometry(0.42, 0.42);
+      var planeMat = new THREE.MeshBasicMaterial({ map: makeNumberTexture(si + 1), transparent: true, depthTest: true, side: THREE.FrontSide });
+      var plane = new THREE.Mesh(planeGeo, planeMat);
+      var center = faceCenters[si];
+      plane.position.copy(center).multiplyScalar(1.005);
+      plane.lookAt(center.clone().multiplyScalar(2));
+      dice.add(plane);
+    }
+    function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+    function animate() { requestAnimationFrame(animate); if (!isRolling && !hasRolled) { dice.rotation.x += 0.008; dice.rotation.y += 0.012; } renderer.render(scene, camera); }
+    animate();
+    diceCanvas.addEventListener("click", function(e) {
+      e.stopPropagation();
+      if (isRolling) return;
+      if (hasRolled) { diceOverlay.style.display = "none"; return; }
+      isRolling = true;
+      diceResult.textContent = "";
+      var resultFace = Math.floor(Math.random() * faceCount);
+      var faceNormal = new THREE.Vector3(normAttr.getX(resultFace * 3), normAttr.getY(resultFace * 3), normAttr.getZ(resultFace * 3));
+      var targetQuat = new THREE.Quaternion().setFromUnitVectors(faceNormal, new THREE.Vector3(0, 0, 1));
+      var targetEuler = new THREE.Euler().setFromQuaternion(targetQuat, "YXZ");
+      var ySpins = (4 + Math.floor(Math.random() * 4)) * Math.PI * 2;
+      var xSpins = (3 + Math.floor(Math.random() * 3)) * Math.PI * 2;
+      var startRotX = dice.rotation.x, startRotY = dice.rotation.y;
+      var finalRotX = targetEuler.x + xSpins, finalRotY = targetEuler.y + ySpins;
+      var duration = 2200, start = performance.now();
+      function step(now) {
+        var elapsed = now - start, t = Math.min(elapsed / duration, 1), e = easeOutExpo(t);
+        dice.rotation.x = startRotX + (finalRotX - startRotX) * e;
+        dice.rotation.y = startRotY + (finalRotY - startRotY) * e;
+        if (t < 1) { requestAnimationFrame(step); }
+        else {
+          isRolling = false;
+          hasRolled = true;
+          dice.rotation.x = targetEuler.x;
+          dice.rotation.y = targetEuler.y;
+          diceResult.textContent = resultFace+1;
+          // 检查棋差一招
+          if (window._lastOptionText && window._lastPrevMsg) {
+            window.checkQichaYizhao(window._lastAttr, resultFace+1);
+          }
+        }
+      }
+      requestAnimationFrame(step);
+    });
+    diceOverlay.addEventListener("click", function(e) {
+      if (e.target === diceOverlay && hasRolled) { diceOverlay.style.display = "none"; }
+    });
+  }
+  initDice();
+
+  // 获取上一轮对话
+  window.getLastMessage = function() {
+    var chatContainer = document.getElementById("chatContainer");
+    if (!chatContainer) return "";
+    var messages = chatContainer.querySelectorAll(".message");
+    if (messages.length < 2) return "";
+    var lastMsg = messages[messages.length - 2];
+    return lastMsg ? lastMsg.textContent.trim() : "";
+  };
+
+  // 棋差一招历史记录
+  var qichaHistory = JSON.parse(localStorage.getItem('qichaHistory') || '[]');
+  window.qichaHistory = qichaHistory;
+  var qichaAchieved = localStorage.getItem('qichaAchieved') === 'true';
+  window.qichaAchieved = qichaAchieved;
+
+  // 记录棋差一招
+  window.recordQicha = function(attr, optionValue, diceValue, playerAttrValue, prevMsg) {
+    var record = {
+      attr: attr,
+      optionValue: optionValue,
+      diceValue: diceValue,
+      playerAttrValue: playerAttrValue,
+      prevMsg: prevMsg,
+      time: new Date().toISOString()
+    };
+    qichaHistory.push(record);
+    localStorage.setItem('qichaHistory', JSON.stringify(qichaHistory));
+    window.qichaHistory = qichaHistory;
+  };
+
+  // 检查棋差一招条件
+  window.checkQichaYizhao = function(attr, diceValue) {
+    if (qichaAchieved) return;
+    var re = new RegExp('[（(]' + attr + '[:：]\\s*([0-9]+)\\s*[）)]');
+    var optionMatch = window._lastOptionText && window._lastOptionText.match(re);
+    console.log('[QICHA] attr=' + attr + ' dice=' + diceValue + ' optText=' + window._lastOptionText);
+    if (!optionMatch) { console.log('[QICHA] no regex match'); return; }
+    var optionValue = parseInt(optionMatch[1]);
+    var attrKeyMap = {'根骨':'root','神识':'spirit','身法':'agility','悟性':'insight','气运':'luck','魅力':'charm'};
+    var attrVal = charStats.stats && charStats.stats[attrKeyMap[attr]];
+    var playerAttrValue = attrVal ? parseInt(attrVal) : 0;
+    console.log('[QICHA] optVal=' + optionValue + ' attrVal=' + attrVal + ' playerAttr=' + playerAttrValue + ' charStats.stats=' + JSON.stringify(charStats.stats));
+    if (optionValue - diceValue - playerAttrValue === 1) {
+      var prevMsg = window._lastPrevMsg || '';
+      console.log('[QICHA] MATCH! prevMsg=' + prevMsg + ' history len=' + qichaHistory.length);
+      window.recordQicha(attr, optionValue, diceValue, playerAttrValue, prevMsg);
+      if (qichaHistory.length >= 3) {
+        var last = qichaHistory[qichaHistory.length - 1];
+        var mid = qichaHistory[qichaHistory.length - 2];
+        var prev = qichaHistory[qichaHistory.length - 3];
+        console.log('[QICHA] last=' + JSON.stringify(last) + ' prev=' + JSON.stringify(prev) + ' mid=' + JSON.stringify(mid));
+        if (last.prevMsg === mid.prevMsg && mid.prevMsg === prev.prevMsg && last.prevMsg !== '') {
+          qichaAchieved = true;
+          localStorage.setItem('qichaAchieved', 'true');
+          alert('成就解锁：天命难违');
+        }
+      }
+    }
+  };
+
+  
+  // 更新棋差一招状态（在读档后调用）
+  window.updateQichaStatus = function() {
+    qichaHistory = JSON.parse(localStorage.getItem('qichaHistory') || '[]');
+    qichaAchieved = localStorage.getItem('qichaAchieved') === 'true';
+    window.qichaHistory = qichaHistory;
+    window.qichaAchieved = qichaAchieved;
+  };
+
+  window.rollDiceIfNeeded = function(optionText) {
+    var attrs = ["根骨", "神识", "身法", "悟性", "气运", "魅力"];
+    for (var i = 0; i < attrs.length; i++) {
+      var re = new RegExp("[（(]" + attrs[i] + "[:：]\s*[0-9]+\s*[）)]");
+      if (re.test(optionText)) {
+        diceAttrLabel.textContent = attrs[i] + " 投掷";
+        diceResult.textContent = "";
+        hasRolled = false;
+        isRolling = false;
+        diceOverlay.style.display = "flex";
+        return attrs[i];
+      }
+    }
+    return null;
+  };
+})();
+
+    
+    function setMsgColor(color) {
+      localStorage.setItem('msgColor', color);
+      document.documentElement.style.setProperty('--text-color', color);
+      // Update preview
+      var preview = document.getElementById('colorPreview');
+      if (preview) {
+        preview.style.color = color;
+      }
+      // Active button
+      document.querySelectorAll('.color-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-color') === color) {
+          btn.classList.add('active');
+        }
+      });
+    }
+    // Load saved color on page load
+    (function() {
+      var saved = localStorage.getItem('msgColor');
+      if (saved) setMsgColor(saved);
+    })();
+function sendEndSimMessage() {
+            const input = document.getElementById('messageInput');
+      const sendBtn = document.getElementById('sendBtn');
+      if (!input || !sendBtn) return;
+      input.value = '结束模拟，给我这次模拟一段结语（禁平和，禁模拟，要激进，最好能触动人心）';
+      input.disabled = true;
+      sendBtn.disabled = true;
+      sendMessage();
+    }</script>
+</body>
+</html>
+

@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设定管理</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+    /* 返回按钮 */
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: #00d4ff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .back-btn:hover {
+      background: rgba(0, 212, 255, 0.2);
+      transform: translateY(-2px);
+    }
+    /* 主标题 */
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: #00ff88;
+    }
+    /* 设定列表 */
+    .settings-list {
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    /* 设定卡片 */
+    .setting-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .setting-card:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(0, 255, 136, 0.5);
+      transform: translateX(5px);
+    }
+    .setting-card.active {
+      border-color: #00ff88;
+      background: rgba(0, 255, 136, 0.1);
+    }
+    .setting-name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .setting-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+    /* 编辑弹窗 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      margin-bottom: 20px;
+      color: #00ff88;
+    }
+    .modal textarea {
+      width: 100%;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      color: white;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+    }
+    .modal textarea:focus {
+      outline: none;
+      border-color: #00ff88;
+    }
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-buttons button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-save {
+      background: linear-gradient(135deg, #00ff88, #00cc6a);
+      color: #000;
+      font-weight: bold;
+    }
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+    }
+    .btn-delete {
+      background: rgba(255, 50, 50, 0.2);
+      color: #ff5050;
+      border: 1px solid rgba(255, 50, 50, 0.3);
+    }
+    .btn-delete:hover {
+      background: rgba(255, 50, 50, 0.3);
+    }
+    .btn-close {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    .btn-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    /* 添加按钮 */
+    .add-btn {
+      margin-top: 20px;
+      padding: 15px 30px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 2px dashed rgba(0, 255, 136, 0.5);
+      border-radius: 12px;
+      color: #00ff88;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 90%;
+      max-width: 600px;
+    }
+    .add-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+      border-color: #00ff88;
+    }
+  </style>
+</head>
+<body>
+  <!-- 返回按钮 -->
+  <button class="back-btn" onclick="window.location.href='game.html'">&#8592; 返回</button>
+  
+  <!-- 主标题 -->
+  <h1>设定管理</h1>
+  
+  <!-- 设定列表 -->
+  <div class="settings-list" id="settingsList">
+    <!-- 动态生成 -->
+  </div>
+  
+  <!-- 添加按钮 -->
+  <button class="add-btn" onclick="createNewSetting()">+ 新建设定</button>
+  
+  <script>
+    // 默认设定列表
+    const defaultSettings = [
+      {
+        id: 'default',
+        name: '空文档',
+        desc: '无额外设定，直接与AI对话',
+        content: ''
+      }
+    ];
+    
+    // 加载设定列表
+    function loadSettings() {
+      const saved = localStorage.getItem('settingsList');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+      return defaultSettings;
+    }
+    
+    // 保存设定列表
+    function saveSettings(settings) {
+      localStorage.setItem('settingsList', JSON.stringify(settings));
+    }
+    
+    // 获取当前激活的设定
+    function getActiveSettingId() {
+      return localStorage.getItem('activeSettingId') || 'default';
+    }
+    
+    // 渲染设定列表
+    function renderSettings() {
+      const settings = loadSettings();
+      const activeId = getActiveSettingId();
+      const listEl = document.getElementById('settingsList');
+      
+      listEl.innerHTML = settings.map(setting => `
+        <div class="setting-card ${setting.id === activeId ? 'active' : ''}" 
+             onclick="openEditor('${setting.id}')">
+          <div class="setting-name">${setting.name}</div>
+          <div class="setting-desc">${setting.desc || '无描述'}</div>
+        </div>
+      `).join('');
+    }
+    
+    // 打开编辑器
+    function openEditor(settingId) {
+      const settings = loadSettings();
+      const setting = settings.find(s => s.id === settingId);
+      if (!setting) return;
+      
+      // 创建弹窗
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.onclick = function(e) {
+        if (e.target === overlay) overlay.remove();
+      };
+      
+      overlay.innerHTML = `
+        <div class="modal">
+          <h2>编辑设定：${setting.name}</h2>
+          <textarea id="settingContent" placeholder="输入System Prompt内容...">${setting.content}</textarea>
+          <div class="modal-buttons">
+            <button class="btn-delete" onclick="deleteSetting('${settingId}')">删除</button>
+            <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">取消</button>
+            <button class="btn-save" onclick="saveSetting('${settingId}')">保存</button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+      
+      // 自动激活
+      activateSetting(settingId);
+    }
+    
+    // 激活设定
+    function activateSetting(settingId) {
+      localStorage.setItem('activeSettingId', settingId);
+      renderSettings();
+    }
+    
+    // 保存设定
+    function saveSetting(settingId) {
+      const content = document.getElementById('settingContent').value;
+      const settings = loadSettings();
+      const setting = settings.find(s => s.id === settingId);
+      
+      if (setting) {
+        setting.content = content;
+        setting.desc = content ? content.substring(0, 30) + (content.length > 30 ? '...' : '') : '无描述';
+        saveSettings(settings);
+        activateSetting(settingId);
+        document.querySelector('.modal-overlay').remove();
+      }
+    }
+    
+    // 删除设定
+    function deleteSetting(settingId) {
+      if (!confirm('确定要删除这个设定吗？')) return;
+      
+      let settings = loadSettings();
+      settings = settings.filter(s => s.id !== settingId);
+      
+      // 如果删除的是当前激活的，切换到第一个
+      if (getActiveSettingId() === settingId) {
+        if (settings.length > 0) {
+          activateSetting(settings[0].id);
+        } else {
+          // 如果没有设定了，恢复默认
+          saveSettings(defaultSettings);
+          activateSetting('default');
+        }
+      }
+      
+      saveSettings(settings);
+      document.querySelector('.modal-overlay').remove();
+    }
+    
+    // 创建新设定
+    function createNewSetting() {
+      const settings = loadSettings();
+      const newId = 'setting_' + Date.now();
+      const newSetting = {
+        id: newId,
+        name: '新设定 ' + (settings.length + 1),
+        desc: '点击编辑设定内容',
+        content: ''
+      };
+      
+      settings.push(newSetting);
+      saveSettings(settings);
+      activateSetting(newId);
+      openEditor(newId);
+    }
+    
+    // 初始化
+    renderSettings();
+  </script>
+</body>
+</html>

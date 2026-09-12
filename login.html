@@ -1,0 +1,442 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI API 登录</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 20px;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo h1 {
+      color: #00d4ff;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .logo p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      font-size: 15px;
+      color: #ffffff;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    .form-group input:focus {
+      border-color: #00d4ff;
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.15);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .tips {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(0, 212, 255, 0.08);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .tips strong {
+      color: #00d4ff;
+    }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .success-msg {
+      color: #51cf66;
+      font-size: 14px;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 16px;
+    }
+
+    .loading::after {
+      content: "...";
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: "."; }
+      40% { content: ".."; }
+      60%, 100% { content: "..."; }
+    }
+
+    .error-detail {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 8px;
+      color: #ff6b6b;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .model-info {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(81, 207, 102, 0.1);
+      border: 1px solid rgba(81, 207, 102, 0.3);
+      border-radius: 8px;
+      color: #51cf66;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>AI API 登录</h1>
+      <p>连接你的 AI 模型</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" name="apiKey" 
+               placeholder="请输入你的 API Key" required>
+        <div class="error-msg" id="apiKeyError">请输入有效的 API Key</div>
+      </div>
+
+      <div class="form-group">
+        <label for="modelName">模型名称</label>
+        <input type="text" id="modelName" name="modelName" 
+               placeholder="例如: gpt-4, claude-3-opus" required>
+        <div class="error-msg" id="modelNameError">请输入模型名称</div>
+      </div>
+
+      <div class="form-group">
+        <label for="baseUrl">Base URL</label>
+        <input type="url" id="baseUrl" name="baseUrl" 
+               placeholder="例如: https://api.openai.com" required>
+        <div class="error-msg" id="baseUrlError">请输入有效的 URL</div>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">连接并验证</button>
+      
+      <div class="loading" id="loading">正在验证连接</div>
+      <div class="error-detail" id="errorDetail"></div>
+      <div class="model-info" id="modelInfo"></div>
+    </form>
+
+    <div class="success-msg" id="successMsg">连接成功！正在进入...</div>
+
+    <div class="tips">
+      <strong>使用说明：</strong><br>
+      • <strong>API Key</strong>：在 AI 服务商后台获取的密钥<br>
+      • <strong>模型名称</strong>：你要连接的模型 ID<br>
+      • <strong>Base URL</strong>：API 的请求地址<br>
+      • 注意：浏览器可能有跨域限制，建议使用支持 CORS 的 API 服务
+    </div>
+  </div>
+
+  <script>
+    // 自动处理 URL 路径，避免 /v1 重复
+    function buildUrl(base, path) {
+      // 如果 base 已经以 /v1 结尾，直接用 path
+      // 否则添加 /v1
+      const cleanBase = base.endsWith('/v1') ? base : base + '/v1';
+      const cleanPath = path.startsWith('/') ? path : '/' + path;
+      return cleanBase + cleanPath;
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loading = document.getElementById('loading');
+    const successMsg = document.getElementById('successMsg');
+    const errorDetail = document.getElementById('errorDetail');
+    const modelInfo = document.getElementById('modelInfo');
+
+    // 页面加载时恢复保存的配置
+    window.onload = function() {
+      const savedApiKey = localStorage.getItem('apiKey');
+      const savedModelName = localStorage.getItem('modelName');
+      const savedBaseUrl = localStorage.getItem('baseUrl');
+
+      if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
+      if (savedModelName) document.getElementById('modelName').value = savedModelName;
+      if (savedBaseUrl) document.getElementById('baseUrl').value = savedBaseUrl;
+    };
+
+    // 表单提交处理
+    loginForm.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const modelName = document.getElementById('modelName').value.trim();
+      const baseUrl = document.getElementById('baseUrl').value.trim();
+
+      // 隐藏之前的消息
+      document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+      successMsg.style.display = 'none';
+      errorDetail.style.display = 'none';
+      modelInfo.style.display = 'none';
+
+      // 基础验证
+      let hasError = false;
+
+      if (!apiKey) {
+        document.getElementById('apiKeyError').style.display = 'block';
+        hasError = true;
+      }
+      if (!modelName) {
+        document.getElementById('modelNameError').style.display = 'block';
+        hasError = true;
+      }
+      if (!baseUrl) {
+        document.getElementById('baseUrlError').style.display = 'block';
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // 验证 URL 格式
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(baseUrl);
+      } catch (e) {
+        document.getElementById('baseUrlError').style.display = 'block';
+        return;
+      }
+
+      // 显示加载状态
+      loginBtn.disabled = true;
+      loading.style.display = 'block';
+
+      // 保存配置到本地
+      localStorage.setItem('apiKey', apiKey);
+      localStorage.setItem('modelName', modelName);
+      localStorage.setItem('baseUrl', baseUrl);
+
+      try {
+        // 并行发送两个请求
+        const promise1 = fetch(buildUrl(baseUrl, '/models'), {
+          headers: { 'Authorization': 'Bearer ' + apiKey }
+        }).then(res => ({ type: 'models', response: res }));
+
+        const promise2 = fetch(buildUrl(baseUrl, '/chat/completions'), {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + apiKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [{ role: 'user', content: 'hi' }],
+            max_tokens: 1
+          })
+        }).then(res => ({ type: 'chat', response: res }));
+
+        const [result1, result2] = await Promise.all([promise1, promise2]);
+
+        // 根据请求类型处理结果
+        let modelsResponse, testResponse;
+        if (result1.type === 'models') {
+          modelsResponse = result1.response;
+          testResponse = result2.response;
+        } else {
+          modelsResponse = result2.response;
+          testResponse = result1.response;
+        }
+
+        // 检查 API Key 是否有效
+        if (modelsResponse.status === 401 || modelsResponse.status === 403) {
+          throw new Error('API Key 无效或已过期');
+        }
+
+        if (modelsResponse.status === 404) {
+          throw new Error('API 端点不存在，请检查 Base URL 是否正确');
+        }
+
+        if (!modelsResponse.ok) {
+          throw new Error('服务器错误: ' + modelsResponse.status);
+        }
+
+        // 检查测试请求结果
+        if (testResponse.status === 401 || testResponse.status === 403) {
+          throw new Error('API Key 无权访问此模型');
+        }
+
+        if (testResponse.status === 404) {
+          throw new Error('模型 "' + modelName + '" 不存在或不可用');
+        }
+
+        if (testResponse.status === 429) {
+          throw new Error('请求过于频繁，请稍后重试');
+        }
+
+        if (!testResponse.ok) {
+          let errorBody;
+          try {
+            errorBody = await testResponse.json();
+            throw new Error('模型验证失败: ' + (errorBody.error?.message || testResponse.statusText));
+          } catch (e) {
+            throw new Error('模型验证失败: ' + testResponse.statusText);
+          }
+        }
+
+        // 验证成功
+        loading.style.display = 'none';
+
+        // 检查模型是否在列表中
+        let modelsData;
+        try {
+          modelsData = await modelsResponse.json();
+        } catch (e) {
+          modelsData = null;
+        }
+
+        const models = modelsData?.data || [];
+        const foundModel = models.find(m => m.id === modelName);
+
+        if (!foundModel) {
+          modelInfo.style.display = 'block';
+          modelInfo.innerHTML = '<strong>注意：</strong>模型 "' + modelName + '" 未在列表中找到，但测试请求成功';
+        }
+
+        // 显示成功信息
+        modelInfo.style.display = 'block';
+        modelInfo.style.background = 'rgba(81, 207, 102, 0.1)';
+        modelInfo.style.border = '1px solid rgba(81, 207, 102, 0.3)';
+        modelInfo.style.color = '#51cf66';
+        modelInfo.innerHTML = '<strong>连接成功！</strong><br>模型: ' + (foundModel?.id || modelName);
+
+        successMsg.style.display = 'block';
+
+        // 延迟跳转到游戏页面
+        setTimeout(() => {
+          window.location.href = 'game.html';
+        }, 1000);
+
+      } catch (error) {
+        loading.style.display = 'none';
+        errorDetail.style.display = 'block';
+        
+        // 根据错误类型显示不同提示
+        let errorMsg = '验证失败: ' + error.message;
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          errorMsg += '<br><br>可能是跨域(CORS)限制，请检查：<br>1. API 服务是否支持 CORS<br>2. 或者使用本地代理转发请求';
+        }
+        
+        errorDetail.innerHTML = errorMsg;
+        console.error('验证失败:', error);
+      } finally {
+        loginBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
