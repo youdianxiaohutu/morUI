@@ -198,7 +198,8 @@
         id: 'default',
         name: '空文档',
         desc: '无额外设定，直接与AI对话',
-        content: ''
+        content: '',
+        type: 'xianxia'
       }
     ];
     
@@ -252,6 +253,7 @@
       overlay.innerHTML = `
         <div class="modal">
           <h2>编辑设定：${setting.name}</h2>
+          <div style="margin:10px 0;"><label style="color:#aaa;font-size:13px;">类型：</label> <select id="settingType" style="background:#16213e;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:4px 8px;"> <option value="xianxia" ${setting.type === 'xianxia' ? 'selected' : ''}>修仙</option> <option value="generic" ${setting.type === 'generic' ? 'selected' : ''}>通用</option></select></div>
           <textarea id="settingContent" placeholder="输入System Prompt内容...">${setting.content}</textarea>
           <div class="modal-buttons">
             <button class="btn-delete" onclick="deleteSetting('${settingId}')">删除</button>
@@ -279,8 +281,10 @@
       const settings = loadSettings();
       const setting = settings.find(s => s.id === settingId);
       
+      const typeEl = document.getElementById('settingType');
       if (setting) {
         setting.content = content;
+        if (typeEl) setting.type = typeEl.value;
         setting.desc = content ? content.substring(0, 30) + (content.length > 30 ? '...' : '') : '无描述';
         saveSettings(settings);
         activateSetting(settingId);

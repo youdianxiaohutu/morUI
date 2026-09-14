@@ -1,0 +1,31 @@
+{
+    "name": "",
+    "appearance": "",
+    "gender": "",
+    "realm": "",
+    "linggen": "",
+    "status": "",
+    "stones": "",
+    "breakthrough": "",
+    "favor": "",
+    "hp": {
+        "current": "",
+        "max": ""
+    },
+    "mp": {
+        "current": "",
+        "max": ""
+    },
+    "life": {
+        "current": "",
+        "max": ""
+    },
+    "stats": {
+        "root": "",
+        "spirit": "",
+        "agility": "",
+        "insight": "",
+        "luck": "",
+        "charm": ""
+    }
+}

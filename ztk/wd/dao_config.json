@@ -1,0 +1,37 @@
+﻿[
+  {
+    "id": 1,
+    "name": "circle_1",
+    "label": "第一重天",
+    "desc": "先天一炁，混元归一",
+    "comment": "起始悟道节点",
+    "cost": "",
+    "costRatio": 0,
+    "unlocked": false,
+    "path": "circle_1"
+  },
+  {
+    "id": 2,
+    "name": "circle_2",
+    "label": "第二重天",
+    "desc": "阴阳交感，万物化生",
+    "comment": "需第一重天完成后解锁",
+    "cost": "0/1",
+    "costRatio": 0,
+    "unlocked": false,
+    "prereq": "circle_1",
+    "path": "circle_2"
+  },
+  {
+    "id": 3,
+    "name": "circle_3",
+    "label": "第三重天",
+    "desc": "三才具足，大道可期",
+    "comment": "需前两层完成后解锁",
+    "cost": "0/1",
+    "costRatio": 0,
+    "unlocked": false,
+    "prereq": "circle_2",
+    "path": "circle_3"
+  }
+]

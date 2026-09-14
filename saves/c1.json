@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "slot": "c1",
+  "timestamp": "2026-09-08T11:58:04.978Z",
+  "stats": "{\n  \"stats\": {\n    \"root\": \"\",\n    \"spirit\": \"\",\n    \"agility\": \"\",\n    \"insight\": \"\",\n    \"luck\": \"\",\n    \"charm\": \"\"\n  },\n  \"mp\": {\n    \"current\": \"\",\n    \"max\": \"\"\n  },\n  \"hp\": {\n    \"current\": \"\",\n    \"max\": \"\"\n  },\n  \"breakthrough\": \"\",\n  \"stones\": \"\",\n  \"appearance\": \"\",\n  \"name\": \"\",\n  \"gender\": \"\",\n  \"status\": \"\",\n  \"life\": {\n    \"current\": \"\",\n    \"max\": \"\"\n  },\n  \"realm\": \"\",\n  \"linggen\": \"\"\n}",
+  "daoConfig": "[\n  {\n    \"id\": 1,\n    \"name\": \"circle_1\",\n    \"label\": \"第一重天\",\n    \"desc\": \"先天一炁，混元归一\",\n    \"comment\": \"起始悟道节点\",\n    \"cost\": \"\",\n    \"costRatio\": 0,\n    \"unlocked\": false,\n    \"path\": \"circle_1\"\n  },\n  {\n    \"id\": 2,\n    \"name\": \"circle_2\",\n    \"label\": \"第二重天\",\n    \"desc\": \"阴阳交感，万物化生\",\n    \"comment\": \"需第一重天完成后解锁\",\n    \"cost\": \"0/1\",\n    \"costRatio\": 0,\n    \"unlocked\": false,\n    \"prereq\": \"circle_1\",\n    \"path\": \"circle_2\"\n  },\n  {\n    \"id\": 3,\n    \"name\": \"circle_3\",\n    \"label\": \"第三重天\",\n    \"desc\": \"三才具足，大道可期\",\n    \"comment\": \"需前两层完成后解锁\",\n    \"cost\": \"0/1\",\n    \"costRatio\": 0,\n    \"unlocked\": false,\n    \"prereq\": \"circle_2\",\n    \"path\": \"circle_3\"\n  }\n]",
+  "daoCircles": "{\n  \"circle_1\": {\n    \"name\": \"\",\n    \"unlocked\": false,\n    \"prereq\": null,\n    \"cost\": \"\",\n    \"desc\": \"\",\n    \"comment\": \"\"\n  },\n  \"circle_2\": {\n    \"name\": \"\",\n    \"unlocked\": false,\n    \"prereq\": null,\n    \"cost\": \"\",\n    \"desc\": \"\",\n    \"comment\": \"\"\n  },\n  \"circle_3\": {\n    \"name\": \"\",\n    \"unlocked\": false,\n    \"prereq\": null,\n    \"cost\": \"\",\n    \"desc\": \"\",\n    \"comment\": \"\"\n  }\n}",
+  "roles": "[]",
+  "chatLog": "玩家: 1+\n\nAI: 看起来你的输入似乎没有打完哦～\"1+\" 后面还想加什么数字呢？\n\n比如：\n- 1 + 1 = ？\n- 1 + 99 = ？\n- 1 + ∞ = ？（哲学家狂喜）\n\n请输入完整的算式，我帮你算！\n\n"
+}

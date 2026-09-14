@@ -222,145 +222,6 @@ background-size: cover;
       background: rgba(0,212,255,0.2);
     }
 
-      /* ===== 悟道 ===== */
-    .dao-content {
-      max-width: 700px;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.8);
-    }
-    .dao-content h2 { color: #00d4ff; margin-bottom: 16px; }
-
-    .dao-circles-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 60px;
-      flex-wrap: wrap;
-      padding: 30px 0;
-    }
-    .dao-circle-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-    }
-    .dao-circle-wrapper.locked {
-      cursor: not-allowed;
-      opacity: 0.45;
-    }
-    .dao-circle-svg {
-      width: 160px;
-      height: 160px;
-      filter: drop-shadow(0 0 8px rgba(0,212,255,0.3));
-      transition: filter 0.4s;
-    }
-    .dao-circle-wrapper.unlocked:not(.locked) .dao-circle-svg {
-      filter: drop-shadow(0 0 16px rgba(0,212,255,0.6));
-    }
-    .dao-circle-wrapper.unlocked:not(.locked):hover .dao-circle-svg {
-      filter: drop-shadow(0 0 24px rgba(0,212,255,0.9));
-    }
-    .dao-circle-svg.golden {
-      filter: drop-shadow(0 0 20px rgba(255,215,0,0.8));
-    }
-    .dao-circle-svg.golden .dao-twist-line {
-      stroke: #ffd700 !important;
-      animation: glowPulseGold 2s ease-in-out infinite;
-    }
-    @keyframes glowPulseGold {
-      0%, 100% { filter: drop-shadow(0 0 4px #ffd700); }
-      50% { filter: drop-shadow(0 0 14px #ffd700); }
-    }
-    .dao-circle-label {
-      font-size: 14px;
-      color: rgba(255,255,255,0.7);
-      text-align: center;
-    }
-    .dao-circle-label.unlocked { color: #ffd700; }
-    .dao-circle-label.locked-label { color: rgba(255,255,255,0.3); }
-    @keyframes rotateCW {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes rotateCCW {
-      from { transform: rotate(360deg); }
-      to { transform: rotate(0deg); }
-    }
-    .dao-twist-group-cw {
-      transform-origin: 80px 80px;
-      animation: rotateCW 8s linear infinite;
-    }
-    .dao-twist-group-ccw {
-      transform-origin: 80px 80px;
-      animation: rotateCCW 8s linear infinite;
-    }
-    .dao-config-panel {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
-      animation: fadeIn 0.3s ease;
-    }
-    .dao-config-panel.show { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .dao-config-panel h3 {
-      color: #00d4ff;
-      margin-bottom: 12px;
-      font-size: 16px;
-    }
-    .dao-config-panel .field {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 8px;
-      align-items: flex-start;
-    }
-    .dao-config-panel .field-label {
-      min-width: 80px;
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      padding-top: 6px;
-    }
-    .dao-config-panel .field-value {
-      flex: 1;
-      font-size: 14px;
-      color: #fff;
-    }
-    .dao-config-panel textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      color: #fff;
-      padding: 8px 12px;
-      font-size: 13px;
-      resize: vertical;
-      min-height: 40px;
-      font-family: inherit;
-      outline: none;
-    }
-    .dao-config-panel textarea:focus {
-      border-color: #00d4ff;
-    }
-    .dao-save-btn {
-      margin-top: 12px;
-      padding: 8px 20px;
-      background: rgba(0,212,255,0.15);
-      border: 1px solid rgba(0,212,255,0.4);
-      border-radius: 8px;
-      color: #00d4ff;
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.2s;
-    }
-    .dao-save-btn:hover {
-      background: rgba(0,212,255,0.3);
-    }
 
     /* ===== 聊天区 ===== */
       .chat-area {
@@ -638,11 +499,9 @@ background-size: cover;
     .field-label { color: var(--text-color) !important; }
     .field-value { color: var(--text-color) !important; }
 
-    .dao-circle-label { color: var(--text-color) !important; }
-    .dao-content h2 { color: var(--text-color) !important; }
 </style>
   <script src="memory.js"></script>
-  <script src="types/xianxia.js"></script>
+  <script src="types/generic.js"></script>
 </head>
 <body>
   <div id="rawMeta" style="display:none;"></div>
@@ -650,7 +509,6 @@ background-size: cover;
     <div class="sidebar-title"></div>
     <div class="nav-item active" data-page="status" onclick='switchPage("status")'>📊 状态卡</div>
     <div class="nav-item" data-page="roles" onclick='switchPage("roles")'>🎭 重要角色</div>
-    <div class="nav-item" data-page="dao" onclick='switchPage("dao")'>☯️ 悟道</div>
     <div class="nav-item" onclick="showSaveLoadUI()">&#x1F4BE; 存档/读档</div>
     <div class="nav-item" style="margin-top:auto;border-top:1px solid rgba(255,255,255,0.1);border-left:none;" onclick="openCustom()">&#x1F4A0; 个性化</div>
     <div class="nav-item" onclick="switchPage('settings')">&#x2699;设置</div>
@@ -690,19 +548,6 @@ background-size: cover;
       </div>
       <div class="page" id="page-roles">
         <div class="roles-container" id="rolesContainer"></div>
-      </div>
-      <div class="page" id="page-dao">
-        <div class="dao-content">
-          <h2>悟道记录</h2>
-          <div class="dao-circles-wrap" id="daoCirclesWrap"></div>
-          <div class="dao-config-panel" id="daoConfigPanel">
-            <h3 id="daoPanelTitle"></h3>
-            <div class="field"><span class="field-label">名字</span><span class="field-value" id="daoFieldName"></span></div>
-            <div class="field"><span class="field-label">作用</span><span class="field-value" id="daoFieldDesc"></span></div>
-            <div class="field"><span class="field-label">注释</span><span class="field-value" id="daoFieldComment"></span></div>
-            <div class="field"><span class="field-label">所需悟道点数</span><span class="field-value" id="daoFieldCost"></span></div>
-          </div>
-        </div>
       </div>
       </div>
       <div class="page" id="page-settings">
@@ -772,7 +617,7 @@ background-size: cover;
 
     let config = loadConfig();
     // ===== 四层记忆模块（新增，不改现有逻辑） =====
-    var _mem = (typeof Memory !== 'undefined') ? Memory.createMemory({ vocab: (typeof XIANXIA_VOCAB !== 'undefined') ? XIANXIA_VOCAB : undefined }) : null;
+    var _mem = (typeof Memory !== 'undefined') ? Memory.createMemory({ vocab: (typeof GENERIC_VOCAB !== 'undefined') ? GENERIC_VOCAB : undefined }) : null;
     function memRemember(resp, meta) { if (_mem) _mem.remember(resp, meta); }
     function memRecall(ctx) { return _mem ? _mem.recall(ctx) : ''; }
 
@@ -1060,36 +905,6 @@ background-size: cover;
       }
     }
 
-    function applyDaoDeltas(dao) {
-      if (dao.circles) {
-        for (const c of dao.circles) {
-          if (!c || !c.name) continue;
-          const target = daoCircles.find(x => x.name === c.name || x.path === c.name);
-          if (target) Object.assign(target, c);
-        }
-      }
-      if (dao.configs) {
-        for (const key of Object.keys(dao.configs)) {
-          daoConfigs[key] = mergeObject(daoConfigs[key] || {}, dao.configs[key]);
-          const target = daoCircles.find(x => x.name === key || x.path === key);
-          if (target && dao.configs[key]) {
-            if (dao.configs[key].unlocked !== undefined) target.unlocked = dao.configs[key].unlocked;
-            if (dao.configs[key].cost !== undefined) target.cost = dao.configs[key].cost;
-          }
-        }
-      }
-      renderDaoCircles();
-      if (selectedCircleId !== null) {
-        const c = daoCircles.find(x => x.id === selectedCircleId);
-        if (c) {
-          const cfg = daoConfigs[c.path] || {};
-          document.getElementById('daoFieldName').textContent = cfg.name || '()';
-          document.getElementById('daoFieldDesc').textContent = cfg.desc || '()';
-          document.getElementById('daoFieldComment').textContent = cfg.comment || '()';
-          document.getElementById('daoFieldCost').textContent = c.cost + (c.costRatio === 1.0 ? ' (已激活)' : '');
-        }
-      }
-    }
 
     async function loadRole(roleId) {
       try {
@@ -1255,10 +1070,10 @@ background-size: cover;
       }
           // Sync text color
       var _c = document.documentElement.style.getPropertyValue('--text-color').trim() || localStorage.getItem('msgColor') || '#ffffff';
-      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value, .dao-circle-label, .dao-content h2').forEach(function(el) { el.style.color = _c; });
+      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value').forEach(function(el) { el.style.color = _c; });
 
       var _c = document.documentElement.style.getPropertyValue('--text-color').trim() || localStorage.getItem('msgColor') || '#ffffff';
-      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value, .dao-circle-label, .dao-content h2').forEach(function(el) { el.style.color = _c; });
+      document.querySelectorAll('.message.ai, .message.user, .char-name, .char-meta, .section-title, .stat-label .name, .stat-label .value, .stat-item .name, .stat-item .value, .field-label, .field-value').forEach(function(el) { el.style.color = _c; });
 }
 
     function updateStatsUI() {
@@ -1434,35 +1249,6 @@ background-size: cover;
                 }
               }
             },
-            dao: {
-              type: "object",
-              description: "悟道增量更新。仅当内容有变化时携带；circles 改 dao_config.json 条目（按 name=circle_N 匹配，可改 unlocked/cost/costRatio/label/desc/comment），configs 改对应 circle_N.json（键为 circle_N，值为 name/desc/comment/cost/unlocked 的变化部分）；无变化则省略此参数",
-              properties: {
-                circles: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      name: { type: "string", description: "circle_1/circle_2/circle_3" },
-                      label: { type: "string" }, unlocked: { type: "boolean" },
-                      cost: { type: "string" }, costRatio: { type: "number" },
-                      desc: { type: "string" }, comment: { type: "string" }
-                    },
-                    required: ["name"]
-                  }
-                },
-                configs: {
-                  type: "object",
-                  additionalProperties: {
-                    type: "object",
-                    properties: {
-                      name: { type: "string" }, desc: { type: "string" }, comment: { type: "string" },
-                      cost: { type: "string" }, unlocked: { type: "boolean" }
-                    }
-                  }
-                }
-              }
-            }
           },
           required: ["body", "options"]
         }
@@ -1625,10 +1411,6 @@ background-size: cover;
               applyRoleDeltas(args.roles);
               loadAllRoles();
               lastUpdatedSections.push('roles');
-            }
-            if (args.dao && (Array.isArray(args.dao.circles) || (args.dao.configs && Object.keys(args.dao.configs).length))) {
-              applyDaoDeltas(args.dao);
-              lastUpdatedSections.push('dao');
             }
             
             console.log('[TOOL] add_chat_options 执行完成');
@@ -1944,86 +1726,6 @@ background-size: cover;
       }
     }
 
-    // ===== 悟道系统 =====
-    let daoCircles = [];
-    let selectedCircleId = null;
-    let daoConfigs = {};
-
-    async function loadDaoCircles() {
-      try {
-        const res = await fetch('ztk/wd/dao_config.json');
-        if (res.ok) {
-          daoCircles = await res.json();
-        }
-      } catch(e) {
-        daoCircles = getDefaultDaoCircles();
-      }
-      for (const c of daoCircles) {
-        try {
-          const r = await fetch('ztk/wd/' + c.path + '.json');
-          if (r.ok) daoConfigs[c.path] = await r.json();
-        } catch(e) {}
-      }
-      renderDaoCircles();
-    }
-
-      function getDefaultDaoCircles() {
-      return [
-        { id:1, name:"circle_1", label:"第一重天", desc:"先天一炁，混元归一", comment:"起始悟道节点", cost:"1/1", costRatio:0, unlocked:false, prereq:null, path:"circle_1" },
-        { id:2, name:"circle_2", label:"第二重天", desc:"阴阳交感，万物化生", comment:"需前一层完成后解锁", cost:"3/5", costRatio:0, unlocked:false, prereq:"circle_1", path:"circle_2" },
-        { id:3, name:"circle_3", label:"第三重天", desc:"三才具足，大道可期", comment:"需前两层完成后解锁", cost:"5/8", costRatio:0, unlocked:false, prereq:"circle_2", path:"circle_3" }
-      ];
-    }
-
-    function createCircleSVG(circle) {
-      const isGolden = circle.costRatio === 1.0;
-      const color = isGolden ? '#ffd700' : '#222';
-      const strokeColor = isGolden ? '#ffd700' : '#222';
-      const dotColor = isGolden ? '#ffd700' : '#666';
-      const goldenCls = isGolden ? 'golden' : '';
-      return `<svg class="dao-circle-svg${goldenCls}" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="80" cy="80" r="70" fill="rgba(20,20,20,0.8)" stroke="${color}" stroke-width="2" opacity="0.6"/>
-        <g class="dao-twist-group-cw">
-          <ellipse cx="80" cy="80" rx="60" ry="25" fill="none" stroke="${strokeColor}" stroke-width="5" class="dao-twist-line" opacity="0.9"/>
-        </g>
-        <g class="dao-twist-group-ccw">
-          <ellipse cx="80" cy="80" rx="25" ry="60" fill="none" stroke="${strokeColor}" stroke-width="5" class="dao-twist-line" opacity="0.9"/>
-        </g>
-        <circle cx="80" cy="80" r="6" fill="${isGolden ? '#ffd700' : '#888'}" opacity="0.8"/>
-        <circle cx="80" cy="10" r="3" fill="${dotColor}" opacity="0.5"/>
-        <circle cx="80" cy="150" r="3" fill="${dotColor}" opacity="0.5"/>
-        <circle cx="10" cy="80" r="3" fill="${dotColor}" opacity="0.5"/>
-        <circle cx="150" cy="80" r="3" fill="${dotColor}" opacity="0.5"/>
-      </svg>`;
-    }
-
-    function renderDaoCircles() {
-      const wrap = document.getElementById('daoCirclesWrap');
-      wrap.innerHTML = '';
-      for (const c of daoCircles) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'dao-circle-wrapper' + (c.unlocked ? ' unlocked' : ' locked');
-        wrapper.dataset.id = c.id;
-        wrapper.innerHTML = createCircleSVG(c) + `<div class="dao-circle-label ${c.unlocked ? 'unlocked' : 'locked-label'}">${c.unlocked ? c.label : '???'}</div>`;
-        wrapper.onclick = () => onCircleClick(c);
-        wrap.appendChild(wrapper);
-      }
-    }
-
-    function onCircleClick(circle) {
-      if (!circle.unlocked) return;
-      selectedCircleId = circle.id;
-      const panel = document.getElementById('daoConfigPanel');
-      const cfg = daoConfigs[circle.path] || {};
-      document.getElementById('daoPanelTitle').textContent = circle.label + ' - 配置详情';
-      document.getElementById('daoFieldName').textContent = cfg.name || '()';
-      document.getElementById('daoFieldDesc').textContent = cfg.desc || '()';
-      document.getElementById('daoFieldComment').textContent = cfg.comment || '()';
-      document.getElementById('daoFieldCost').textContent = circle.cost + (circle.costRatio === 1.0 ? ' (已激活)' : '');
-      panel.classList.add('show');
-    }
-
-    loadDaoCircles();
 
     // ===== 初始化 =====
     loadStats();
@@ -2234,7 +1936,6 @@ background-size: cover;
     async function saveGame(slot) {
       try {
         var statsJson = JSON.stringify(charStats, null, 2);
-        var daoConfigJson = JSON.stringify(daoCircles, null, 2);
         var rolesJson = JSON.stringify(roles, null, 2);
         var chatLog = "";
         if (chatHistory && chatHistory.length > 0) {
@@ -2249,8 +1950,6 @@ background-size: cover;
           slot: slot,
           timestamp: new Date().toISOString(),
           stats: statsJson,
-          daoConfig: daoConfigJson,
-          daoCircles: JSON.stringify(daoConfigs, null, 2),
           roles: rolesJson,
           chatLog: chatLog,
           memory: _mem ? _mem.exportMemory() : null
@@ -2265,7 +1964,6 @@ background-size: cover;
           renderSaveSlots();
           updateStatsUI();
           loadAllRoles();
-          renderDaoCircles();
           alert("存档 " + slot + " 成功！");
         } else {
           alert("存档失败，请确认后端服务已启动");
@@ -2284,8 +1982,6 @@ background-size: cover;
         }
         var data = await res.json();
         if (data.stats) charStats = JSON.parse(data.stats);
-        if (data.daoConfig) daoCircles = JSON.parse(data.daoConfig);
-        if (data.daoCircles) daoConfigs = JSON.parse(data.daoCircles);
         if (data.roles) {
           roles.length = 0;
           var loadedRoles = JSON.parse(data.roles);
@@ -2335,7 +2031,6 @@ background-size: cover;
         }
         updateStatsUI();
         loadAllRoles();
-        renderDaoCircles();
         window.updateQichaStatus();
         alert("读档 " + slot + " 成功！");
       } catch(e) {

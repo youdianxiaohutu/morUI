@@ -173,7 +173,13 @@
     };
     // 创造世界：跳转到聊天页面
     function startGame() {
-      window.location.href = 'chat.html';
+      // 按当前激活设定包的 type 路由到对应 chat（修仙→chat.html，通用→chat_generic.html）
+      var settings = JSON.parse(localStorage.getItem('settingsList') || 'null');
+      var activeId = localStorage.getItem('activeSettingId') || 'default';
+      var active = (settings && Array.isArray(settings)) ? settings.find(function(x){return x.id === activeId;}) : null;
+      var type = (active && active.type) || 'xianxia';
+      var target = type === 'generic' ? 'chat_generic.html' : 'chat.html';
+      window.location.href = target;
     }
     // 打开设定
     function openSettings() {
